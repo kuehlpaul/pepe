@@ -1,0 +1,28 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "context-layer",
+	"account_id": "e21c755b035151eb1a092ee1de22ef20", // Personal
+	"main": "src/index.ts",
+	"compatibility_date": "2026-11-06",
+	// global_fetch_strictly_public: required for OAuth Client ID Metadata Documents (server fetches client URLs)
+	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+	"observability": { "enabled": true },
+	"vars": {
+		// Public base URL of this Worker, no trailing slash. Overridden in .dev.vars for local dev.
+		"PUBLIC_URL": "https://context-layer.winter-limit-1658.workers.dev",
+		"EMBEDDING_MODEL": "@cf/baai/bge-m3",
+		// The account with this email may sign up without an invite, becomes admin, and inherits data from the single-owner era.
+		"ADMIN_EMAIL": "paul_kuehl@icloud.com",
+		// Optional: sender for invite / reset emails (needs the RESEND_API_KEY secret). Empty = links are copied and sent manually.
+		"EMAIL_FROM": ""
+	},
+	"d1_databases": [
+		{ "binding": "DB", "database_name": "context-layer", "database_id": "0d798f60-8e60-4d33-8066-b010822e4a45", "migrations_dir": "migrations" }
+	],
+	"kv_namespaces": [{ "binding": "OAUTH_KV", "id": "017dd4aaa50d419fbd465da70943d5c4" }],
+	"vectorize": [{ "binding": "VECTORS", "index_name": "context-layer", "remote": true }],
+	"ai": { "binding": "AI", "remote": true },
+	// Daily maintenance: duplicate detection + housekeeping report (06:00 UTC)
+	"triggers": { "crons": ["0 6 * * *"] }
+	// Secrets (wrangler secret put / .dev.vars): SESSION_SECRET, CONSENT_SECRET, optional RESEND_API_KEY
+}
