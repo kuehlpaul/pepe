@@ -2,6 +2,8 @@
 
 One remote MCP server on Cloudflare that gives every agent a person uses (Claude, Claude Code, Cursor, ChatGPT, …) the same durable memory about them. Vendor-independent, user-owned data. Invite-only product: a public waitlist, an admin panel that hands out invites, isolated accounts.
 
+Open source under the MIT license. Use the hosted version at https://context-layer.winter-limit-1658.workers.dev (invite-only beta, join the waitlist) or self-host it on your own Cloudflare account, see [Deploy](#deploy--upgrade).
+
 Modeled on [Notion’s agent setup prompt](https://developers.notion.com/prompts/setup): a user shares `/setup` with an agent; it connects MCP, installs **custom instructions** (when to read/write), creates an Agent Operating Guide, and optionally imports context + a daily loop.
 
 ## Product surface
@@ -76,3 +78,7 @@ Manual:
 - OAuth clients: add `https://<worker>/mcp` as a remote MCP server, sign in, approve.
 - Header-only clients: create a token under Settings → `Authorization: Bearer pcl_…`.
 - Claude Code: `claude mcp add --transport http context https://<worker>/mcp`
+
+## License
+
+MIT, see [LICENSE](LICENSE).

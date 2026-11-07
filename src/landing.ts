@@ -1,96 +1,215 @@
 // Public start page: what the product is, and the waitlist form. No personal data is shown here.
+// Layout follows the "New Design" artboard in the Paper file "Context Layer – Screens & UI":
+// a sticky left panel (badge, headline, waitlist form) and a scrolling right column with a
+// three-cell nav, ruled section headers, a 1px-bordered feature grid and an infrastructure table.
 import { escape } from "./html";
 import { isEmail, joinWaitlist, normalizeEmail } from "./accounts";
 
 const CSS = `
-:root{--bg:#fff;--bg-2:#f7f7f5;--text:#0f0f0f;--text-2:#5c5c5c;--text-3:#8a8a8a;--border:#e8e8e8;--accent:#0f0f0f;--accent-fg:#fff;--ok-bg:#e6f4ea;--ok-fg:#1e4620;
---font:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,SFMono-Regular,Menlo,monospace;color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#0f0f0f;--bg-2:#171717;--text:#ededed;--text-2:#a3a3a3;--text-3:#737373;--border:#262626;--accent:#ededed;--accent-fg:#0f0f0f;--ok-bg:#1d3324;--ok-fg:#c8e6cf}}
-*{box-sizing:border-box}body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
-a{color:inherit}
-.top{display:flex;align-items:center;gap:16px;padding:0 24px;height:60px;border-bottom:1px solid var(--border)}
-.brand{display:flex;align-items:center;gap:10px;font-weight:600;text-decoration:none}
-.mark{width:24px;height:24px;border-radius:6px;background:var(--text);color:var(--bg);display:grid;place-items:center;font-size:.7rem;font-weight:700}
-.top nav{margin-left:auto;display:flex;gap:18px;font-size:.9rem}.top nav a{color:var(--text-2);text-decoration:none}.top nav a:hover{color:var(--text)}
-.wrap{max-width:860px;margin:0 auto;padding:0 20px}
-.hero{padding:72px 0 40px}
-.eyebrow{display:inline-block;font-size:.78rem;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);border:1px solid var(--border);border-radius:99px;padding:3px 10px;margin-bottom:18px}
-h1{font-size:clamp(2rem,5vw,3rem);line-height:1.1;letter-spacing:-.03em;margin:0 0 16px;font-weight:700}
-.lede{font-size:1.15rem;color:var(--text-2);max-width:40rem;margin:0 0 28px}
-.form{display:flex;flex-direction:column;gap:10px;max-width:34rem}
-.form .row{display:flex;gap:8px;flex-wrap:wrap}
-input,textarea{font:inherit;padding:11px 14px;border:1px solid var(--border);border-radius:9px;background:var(--bg-2);color:var(--text);width:100%}
-input:focus,textarea:focus{outline:2px solid var(--text);outline-offset:1px}
-.row input{flex:1;min-width:200px}
-textarea{min-height:70px;resize:vertical}
-button{font:inherit;font-weight:600;padding:11px 18px;border:0;border-radius:9px;background:var(--accent);color:var(--accent-fg);cursor:pointer;white-space:nowrap}
-.hint{font-size:.85rem;color:var(--text-3);margin:4px 0 0}
-.ok{background:var(--ok-bg);color:var(--ok-fg);padding:14px 16px;border-radius:9px;max-width:34rem}
+:root{--bg:#fff;--bg-2:#f7f7f5;--text:#0f0f0f;--text-2:#5c5c5c;--text-3:#8a8a8a;--border:#e8e8e8;--ok-bg:#e6f4ea;--ok-fg:#1e4620;--danger:#c92a2a;
+--sans:Geist,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+--xs:12.5px;--table:14px;--base:16px;--h2:17.6px;--display:48px;--wide:.04em;color-scheme:light dark}
+@media (prefers-color-scheme:dark){:root{--bg:#0f0f0f;--bg-2:#171717;--text:#ededed;--text-2:#a3a3a3;--text-3:#737373;--border:#262626;--ok-bg:#1d3324;--ok-fg:#c8e6cf;--danger:#ff6b6b}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);font-size:var(--table);line-height:18px;letter-spacing:var(--wide);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+a{color:inherit;text-decoration:none}
+.mono{font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:var(--wide)}
+
+/* Split layout: 40% sticky panel | 1px rule | 60% content */
+.page{display:flex;align-items:stretch;min-height:100vh}
+.panel{flex:1 1 40%;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:16px;padding:16px 32px;overflow:hidden}
+.rule-v{flex:0 0 1px;background:var(--border)}
+.content{flex:0 0 60%;width:60%;display:flex;flex-direction:column}
+
+/* Left panel */
+.badge{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:99px;background:var(--bg-2);font-size:var(--xs);line-height:18px}
+.badge .dim{color:var(--text-3)}
+.badge .sep{width:1px;height:12px;background:var(--text)}
+.badge b{font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.badge svg{width:16px;height:16px;flex:none}
+h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weight:500;line-height:1.1;letter-spacing:-.03em}
+.form{display:flex;align-items:center;gap:24px;padding-top:16px;flex-wrap:wrap}
+.field{position:relative;width:250px;max-width:100%}
+.field::before{content:"";position:absolute;left:-6px;right:-6px;top:0;bottom:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);pointer-events:none}
+.field::after{content:"";position:absolute;top:-6px;bottom:-6px;left:0;right:0;border-left:1px solid var(--border);border-right:1px solid var(--border);pointer-events:none}
+.field .plus{position:absolute;right:-10px;bottom:-10px;width:8px;height:8px;font:8px/8px var(--mono);color:var(--border);text-align:center;pointer-events:none}
+.field input{display:block;width:100%;margin:0;padding:8px 20px;border:0;background:transparent;color:var(--text);font:500 14px/20px var(--sans);letter-spacing:0;outline:0}
+.field input::placeholder{color:var(--text-3)}
+.field:focus-within::before,.field:focus-within::after{border-color:var(--text)}
+.field:focus-within .plus{color:var(--text)}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border:0;background:var(--text);color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:500;line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.btn:hover{opacity:.85}
+.hint{margin:0;font-size:var(--xs);line-height:16px;color:var(--text-3);max-width:454px}
+.hint.err{color:var(--danger)}
 .hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
-section{padding:36px 0;border-top:1px solid var(--border)}
-h2{font-size:1.35rem;letter-spacing:-.01em;margin:0 0 18px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
-.card{border:1px solid var(--border);border-radius:12px;padding:16px 18px;background:var(--bg-2)}
-.card h3{margin:0 0 6px;font-size:1rem}.card p{margin:0;color:var(--text-2);font-size:.92rem}
-.step{display:flex;gap:14px}.num{flex:0 0 28px;height:28px;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:.8rem;font-weight:600}
-.steps{display:flex;flex-direction:column;gap:16px;max-width:44rem}.step p{margin:2px 0 0;color:var(--text-2)}
-.logos{display:flex;flex-wrap:wrap;gap:8px}.logo{border:1px solid var(--border);border-radius:99px;padding:4px 12px;font-size:.85rem;color:var(--text-2)}
-code{font-family:var(--mono);font-size:.85em;background:var(--bg-2);border:1px solid var(--border);padding:.1em .35em;border-radius:4px}
-footer{padding:28px 0 48px;color:var(--text-3);font-size:.85rem;border-top:1px solid var(--border)}
-footer a{color:var(--text-2)}
+.ok{margin-top:16px;max-width:454px;padding:12px 16px;background:var(--ok-bg);color:var(--ok-fg);font-size:var(--table);line-height:18px}
+.ok b{font-weight:500}
+
+/* Right column: nav */
+.nav{display:flex;align-items:stretch;border-bottom:1px solid var(--border)}
+.nav a{flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;font-size:var(--table);line-height:18px}
+.nav a+a{border-left:1px solid var(--border)}
+.nav a:hover{background:var(--bg-2)}
+.nav a.cta,.nav a.cta:hover{background:var(--text);color:var(--bg)}
+.nav svg{width:16px;height:16px;flex:none}
+
+/* Right column: sections */
+.body{display:flex;flex-direction:column;gap:36px;padding:36px}
+section{display:flex;flex-direction:column;gap:24px}
+.sh{display:flex;align-items:center;gap:16px}
+.sh h2{margin:0;font-size:var(--h2);line-height:18px;white-space:nowrap}
+.sh .line{flex:1;height:1px;background:var(--border)}
+.sh.r{justify-content:flex-end}.sh.r span{font-size:var(--xs);line-height:18px;color:var(--text-3);white-space:nowrap}
+section p{margin:0;font-size:var(--table);line-height:18px}
+section p+p{margin-top:8px}
+code{font-family:var(--mono);font-size:.92em;letter-spacing:0;background:var(--bg-2);padding:1px 5px}
+
+.logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px}
+.logos span{font-family:var(--mono);font-size:var(--xs);line-height:20px;color:var(--text-2);white-space:nowrap}
+
+.grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
+.cell{display:flex;flex-direction:column;gap:8px;padding:16px 16px 56px;min-width:0;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
+.cell:nth-child(3n){border-right:0}
+.cell:nth-last-child(-n+3){border-bottom:0}
+.cell .n{font-family:var(--mono);font-size:var(--table);line-height:18px;color:var(--text-3)}
+.cell h3{margin:0;font-size:var(--base);font-weight:400;line-height:18px}
+.cell p{font-size:var(--xs);line-height:16px;color:var(--text-3)}
+
+pre{margin:0;padding:12px 16px;border:1px solid var(--border);background:var(--bg-2);font-family:var(--mono);font-size:var(--xs);line-height:18px;letter-spacing:0;overflow-x:auto;white-space:pre}
+.two{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border)}
+.two>div{display:flex;flex-direction:column;gap:12px;padding:16px;min-width:0}
+.two>div+div{border-left:1px solid var(--border)}
+.two .tag{font-family:var(--mono);font-size:var(--xs);line-height:18px;color:var(--text-3);text-transform:uppercase;letter-spacing:var(--wide)}
+.two h3{margin:0;font-size:var(--base);font-weight:400;line-height:18px}
+.two p{color:var(--text-2)}
+.two .cta{margin-top:auto;display:inline-flex;align-items:center;gap:4px;align-self:flex-start;font-family:var(--mono);font-size:11px;font-weight:500;line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;border-bottom:1px solid var(--text)}
+.two .cta svg{width:16px;height:16px}
+.table{border:1px solid var(--border)}
+.tr{display:grid;grid-template-columns:180px 1fr;border-bottom:1px solid var(--border)}
+.tr:last-child{border-bottom:0}
+.tr>*{padding:12px 16px;font-size:var(--table);line-height:18px}
+.tr .k{font-family:var(--mono);color:var(--text-3);border-right:1px solid var(--border)}
+.tr .v{color:var(--text)}
+
+footer{display:flex;flex-wrap:wrap;gap:8px 24px;padding:16px 36px 36px;font-family:var(--mono);font-size:var(--xs);line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;color:var(--text-3);border-top:1px solid var(--border)}
+footer a:hover{color:var(--text)}
+
+@media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.cell:nth-child(3n){border-right:1px solid var(--border)}.cell:nth-child(2n){border-right:0}.cell:nth-last-child(-n+3){border-bottom:1px solid var(--border)}.cell:nth-last-child(-n+2){border-bottom:0}}
+@media (max-width:900px){
+.page{flex-direction:column}
+.panel{position:static;height:auto;min-height:min(60vh,560px);padding:56px 24px 48px}
+.rule-v{flex:0 0 1px;height:1px;width:100%}
+.content{flex:1 1 auto;width:100%}
+.body{padding:24px 16px;gap:28px}
+.nav a{padding:14px 6px;font-size:11px;gap:6px}
+.two{grid-template-columns:1fr}.two>div+div{border-left:0;border-top:1px solid var(--border)}
+.grid{grid-template-columns:1fr}.cell{border-right:0!important;border-bottom:1px solid var(--border)!important}.cell:last-child{border-bottom:0!important}
+.tr{grid-template-columns:120px 1fr}
+footer{padding:16px 16px 32px}
+}
+@media (max-width:480px){h1{font-size:36px}.form{gap:20px}.field{width:100%}.tr{grid-template-columns:1fr}.tr .k{border-right:0;border-bottom:1px solid var(--border);padding-bottom:8px}.tr .v{padding-top:8px}}
 `;
+
+export const REPO_URL = "https://github.com/kuehlpaul/personal-context-layer";
+
+const ARROW_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.787 8.667H2.667V7.333h8.12L7.053 3.6 8 2.667l5.333 5.333L8 13.333l-.947-.933 3.734-3.733Z" fill="currentColor"/></svg>`;
+const ARROW_UP_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.267 12 3.333 11.067 9.733 4.667H4V3.333h8v8h-1.333V5.6L4.267 12Z" fill="currentColor"/></svg>`;
+
+const FEATURES: Array<[string, string]> = [
+	["Memories", "Preferences, facts, decisions and the people around you. One fact per memory, with source and date. Superseded instead of overwritten, so history stays."],
+	["Documents", "Plans, specs, research and meeting notes in Markdown. Every edit is versioned with which agent wrote it, and older versions stay readable."],
+	["Lessons", "When you correct an agent, the correction becomes guidance every other agent receives the moment it connects. Mistakes are made once."],
+	["Skills", "Reusable, SKILL.md-style instructions. Any agent lists them, loads the one that applies to the task and follows it."],
+	["Search", "Semantic search over everything you've stored, plus keyword fallback. Agents call it before working on anything personal."],
+	["Your rules", "Tell it what must never be stored. Forgotten content is blocked from being re-saved. Every write by every agent is logged and editable."],
+];
+
+const INFRA: Array<[string, string]> = [
+	["Protocol", "Remote MCP over Streamable HTTP. Works with any MCP-capable agent, no plugin required."],
+	["Auth", "OAuth 2.1 with dynamic client registration. Clients without OAuth use a personal token bound to your account."],
+	["Runtime", "One Cloudflare Worker serves the MCP endpoint, the web app and this page. No servers to keep alive."],
+	["Storage", "Cloudflare D1 for memories, documents, skills and the activity log. Every row is scoped to your account."],
+	["Search", "Cloudflare Vectorize with one namespace per user, embeddings from Workers AI (bge-m3)."],
+	["Isolation", "Per-user data isolation, independently audited. Disabling an account revokes every session, token and grant at once."],
+	["Source", "Open source on GitHub. Self-host it on your own Cloudflare account, read every line that touches your data, or send a pull request."],
+	["Exit", "Export everything as JSON or delete the account and all its data in one click. Nothing is kept."],
+];
 
 export function landingHtml(base: string, state: { joined?: boolean; error?: string; email?: string } = {}) {
 	const form = state.joined
-		? `<div class="ok"><strong>You're on the list.</strong> Invites go out in small batches. When it's your turn you'll get a personal link to create your account.</div>`
-		: `<form class="form" method="post" action="/waitlist">
-			${state.error ? `<p class="hint" style="color:#c92a2a">${escape(state.error)}</p>` : ""}
-			<div class="row"><input type="email" name="email" placeholder="you@example.com" value="${escape(state.email)}" autocomplete="email" required><button>Request an invite</button></div>
-			<textarea name="reason" placeholder="Optional: which agents do you use, and what would you want them to remember?"></textarea>
+		? `<div class="ok" id="waitlist"><b>You're on the list.</b> Invites go out in small batches. When it's your turn you'll get a personal link to create your account.</div>`
+		: `<form class="form" id="waitlist" method="post" action="/waitlist">
+			<label class="field"><span class="plus">+</span><input id="email" type="email" name="email" placeholder="Your Email" value="${escape(state.email)}" autocomplete="email" required aria-label="Your email"></label>
 			<label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
-			<p class="hint">Invite-only while we're small. No newsletter, no sharing of your email.</p>
-		</form>`;
+			<button class="btn" type="submit">Join waitlist</button>
+		</form>
+		${state.error ? `<p class="hint err">${escape(state.error)}</p>` : `<p class="hint">Hosted beta is invite-only while we're small. No newsletter, no sharing of your email.<br>Prefer to run it yourself? <a href="${REPO_URL}" style="color:var(--text);border-bottom:1px solid var(--border)">It's open source.</a></p>`}`;
+
+	const features = FEATURES.map(([title, text], i) => `<div class="cell"><span class="n">${String(i + 1).padStart(2, "0")}</span><h3>${escape(title)}</h3><p>${escape(text)}</p></div>`).join("");
+	const infra = INFRA.map(([k, v]) => `<div class="tr"><div class="k">${escape(k)}</div><div class="v">${escape(v)}</div></div>`).join("");
 
 	return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Context Layer · One memory for every AI agent you use</title>
 <meta name="description" content="A personal context layer: one remote MCP server that gives Claude, ChatGPT, Cursor, Claude Code and any other agent the same durable memory about you. You own the data.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
 <style>${CSS}</style></head><body>
-<header class="top"><a class="brand" href="/"><span class="mark">CL</span> Context Layer</a><nav><a href="${escape(base)}/setup">Setup guide</a><a href="/login">Sign in</a></nav></header>
-<main class="wrap">
-<div class="hero">
-<span class="eyebrow">Private beta · invite only</span>
-<h1>One memory for every AI agent you use.</h1>
-<p class="lede">Context Layer is a personal memory that Claude, ChatGPT, Cursor, Claude Code and any other MCP-capable agent can read and write. Switch tools without re-explaining yourself. Your context stays yours, not the vendor's.</p>
+<div class="page">
+<aside class="panel">
+<span class="badge"><span class="dim">Private beta</span><span class="sep"></span><b>Invite only ${ARROW_RIGHT}</b></span>
+<h1>One memory for every AI agent.</h1>
 ${form}
+</aside>
+<div class="rule-v"></div>
+<main class="content">
+<nav class="nav mono" aria-label="Page">
+<a href="#readme">Readme</a>
+<a href="${escape(base)}/setup">Docs</a>
+<a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a>
+<a href="#waitlist" class="cta" id="nav-waitlist">Waitlist ${ARROW_UP_RIGHT}</a>
+</nav>
+<div class="body">
+
+<section id="readme">
+<div class="sh"><h2 class="mono">Readme</h2><span class="line"></span></div>
+<div>
+<p>Context Layer is a personal memory that Claude, ChatGPT, Cursor, Claude Code and any other MCP-capable agent can read and write. Switch tools without re-explaining yourself: what one agent learned, the next one knows. Your context stays yours, not the vendor's.</p>
+<p>It's open source. Run the hosted version (invite-only beta, join the waitlist) or deploy your own copy on your Cloudflare account in a few minutes. Same code, same features, either way the data is yours.</p>
+<p>Connect an agent in one step by sharing the setup guide with it. It connects over MCP with OAuth, installs a short set of custom instructions and knows when to read and when to save. From then on every session starts with <code>get_context</code> and <code>search</code>, and ends with what's worth remembering.</p>
 </div>
+</section>
 
-<section><h2>How it works</h2>
-<div class="steps">
-<div class="step"><span class="num">1</span><div><strong>Connect any agent in one step.</strong><p>Share the setup page with your agent. It connects over MCP with OAuth, installs a short set of custom instructions, and knows when to read and when to save.</p></div></div>
-<div class="step"><span class="num">2</span><div><strong>Agents remember what matters.</strong><p>Decisions and why you made them, preferences, project state, lessons from mistakes, reusable skills, plans and research. One fact per memory, with source and date.</p></div></div>
-<div class="step"><span class="num">3</span><div><strong>Every next session starts smarter.</strong><p>Any agent calls <code>get_context</code> and <code>search</code> before working on something personal. What one tool learned, the next one knows.</p></div></div>
-</div></section>
+<section id="get-it">
+<div class="sh"><h2 class="mono">Hosted or self-hosted</h2><span class="line"></span></div>
+<div class="two">
+<div><span class="tag">01 · Hosted</span><h3>Use the hosted version</h3><p>We run it on Cloudflare. Accounts are isolated, every write is logged, and you can export or delete everything at any time. Invite-only while the beta is small.</p><a class="cta" href="#waitlist">Join the waitlist ${ARROW_RIGHT}</a></div>
+<div><span class="tag">02 · Self-hosted</span><h3>Deploy your own</h3><p>Clone the repository, create the Cloudflare resources listed in the README and deploy. Your account, your Worker, your data.</p><pre>git clone ${REPO_URL}.git
+cd personal-context-layer &amp;&amp; npm install
+npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View on GitHub ${ARROW_UP_RIGHT}</a></div>
+</div>
+</section>
 
-<section><h2>What it stores</h2>
-<div class="grid">
-<div class="card"><h3>Memories</h3><p>Preferences, facts, decisions, people, corrections. Superseded instead of overwritten, so history stays.</p></div>
-<div class="card"><h3>Documents</h3><p>Plans, specs, research, meeting notes. Every edit is versioned with which agent wrote it.</p></div>
-<div class="card"><h3>Lessons</h3><p>When you correct an agent, the correction becomes guidance every other agent gets on connect.</p></div>
-<div class="card"><h3>Skills</h3><p>Reusable instructions any agent can load when they apply to the task.</p></div>
-</div></section>
+<section>
+<div class="sh r"><span class="line"></span><span class="mono">Works with following agents</span></div>
+<div class="logos"><span>Claude</span><span>Claude Code</span><span>ChatGPT</span><span>Codex</span><span>Cursor</span><span>Windsurf</span><span>Gemini CLI</span><span>Any MCP client</span></div>
+</section>
 
-<section><h2>Works with</h2>
-<div class="logos"><span class="logo">Claude</span><span class="logo">Claude Code</span><span class="logo">ChatGPT</span><span class="logo">Cursor</span><span class="logo">Any MCP client</span></div>
-<p style="color:var(--text-2);margin-top:14px">Remote MCP over Streamable HTTP with OAuth 2.1. Clients without OAuth use a personal token.</p></section>
+<section id="features">
+<div class="sh"><h2 class="mono">Features</h2><span class="line"></span></div>
+<div class="grid">${features}</div>
+</section>
 
-<section><h2>You own it</h2>
-<div class="grid">
-<div class="card"><h3>Nothing hidden</h3><p>Every write by every agent is logged. Review, edit and delete anything in the web app.</p></div>
-<div class="card"><h3>Exclusions &amp; forget</h3><p>Tell it what must never be stored. Forgotten content is blocked from being re-saved.</p></div>
-<div class="card"><h3>Export &amp; delete</h3><p>Download everything as JSON or delete your account and all data, any time, in one click.</p></div>
-</div></section>
+<section id="infrastructure">
+<div class="sh"><h2 class="mono">Infrastructure</h2><span class="line"></span></div>
+<div class="table">${infra}</div>
+</section>
+
+</div>
+<footer><span>Context Layer</span><a href="${escape(base)}/setup">Setup guide for agents</a><a href="${REPO_URL}" rel="noopener">GitHub</a><a href="/login">Sign in</a></footer>
 </main>
-<footer class="wrap">Context Layer · <a href="${escape(base)}/setup">Setup guide for agents</a> · <a href="/login">Sign in</a></footer>
+</div>
+<script>document.getElementById('nav-waitlist').addEventListener('click',function(e){var i=document.getElementById('email');if(i){e.preventDefault();i.scrollIntoView({behavior:'smooth',block:'center'});i.focus({preventScroll:true})}});</script>
 </body></html>`;
 }
 
