@@ -1,84 +1,226 @@
+<div align="center">
+
 # Context Layer
 
-One remote MCP server on Cloudflare that gives every agent a person uses (Claude, Claude Code, Cursor, ChatGPT, …) the same durable memory about them. Vendor-independent, user-owned data. Invite-only product: a public waitlist, an admin panel that hands out invites, isolated accounts.
+**One memory for every AI agent.**
 
-Open source under the MIT license. Use the hosted version at https://context-layer.winter-limit-1658.workers.dev (invite-only beta, join the waitlist) or self-host it on your own Cloudflare account, see [Deploy](#deploy--upgrade).
+A self-hostable, remote [MCP](https://modelcontextprotocol.io) server that gives every agent you use (Claude, Claude Code, Cursor, ChatGPT, …) the same durable memory about you. Vendor-independent. Your data, on your own Cloudflare account.
 
-Modeled on [Notion’s agent setup prompt](https://developers.notion.com/prompts/setup): a user shares `/setup` with an agent; it connects MCP, installs **custom instructions** (when to read/write), creates an Agent Operating Guide, and optionally imports context + a daily loop.
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Cloudflare Workers](https://img.shields.io/badge/runs%20on-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
+[![MCP](https://img.shields.io/badge/protocol-MCP-000000)](https://modelcontextprotocol.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-## Product surface
+[Hosted beta](https://context-layer.winter-limit-1658.workers.dev) · [Self-host](#self-hosting) · [MCP tools](#mcp-tools) · [Contributing](#contributing)
 
-| Path | Who | What |
-|---|---|---|
-| `/` | public | Landing page + waitlist form (`POST /waitlist`) |
-| `/join?code=…` | invited | Create an account. Only valid invite codes work; the `ADMIN_EMAIL` account may bootstrap once without a code |
-| `/login`, `/logout`, `/forgot`, `/reset` | users | Email + password sessions, password reset links |
-| `/ui/…` | users | Memories, documents, skills, lessons, settings (tokens, connected apps, export, delete account), activity |
-| `/admin` | admins | Waitlist → invite, create/revoke invites, enable/disable/delete accounts, reset links |
-| `/setup`, `/setup.md` | public | Setup guide agents follow end-to-end (no personal data) |
-| `/mcp` | agents | MCP endpoint, OAuth 2.1 or personal token; every token is bound to one account |
+</div>
 
-## Access control
+---
 
-- **Waitlist** entries grant nothing. In `/admin` the owner turns one into a single-use invite bound to that email (14 days). Free-form invites (any email, N uses, optional expiry) are possible too.
-- **Accounts** are isolated: every table carries `user_id`, every query in `src/store.ts` filters on it, and vectors live in a per-user Vectorize namespace.
-- **Disabling** an account kills its sessions, tokens and OAuth grants immediately (checked on every MCP request). **Deleting** removes all rows, vectors and OAuth grants. Changing or resetting a password signs out every other session.
-- **Legacy grants** (OAuth connections approved before accounts existed) are bound once, at claim time, to the account that adopted the single-owner data (`instance.legacy_owner_user_id`), never re-resolved from roles.
-- Independently audited for cross-account access (2026-11-07); findings fixed in migration 0004 and the matching code.
-- **Email sending** is optional (`RESEND_API_KEY` secret + `EMAIL_FROM` var). Without it, invite and reset links are shown in the admin panel to copy and send manually.
+## Why
 
-## Stack
+Every agent you use keeps its own notes about you, and none of them talk to each other. Switch from Claude to Cursor to ChatGPT and you start from zero each time. Context Layer is a single MCP endpoint that all of them connect to, so a lesson learned in one tool applies in every other.
 
-| Concern | Cloudflare |
+- **Vendor-independent.** Works with any MCP client via OAuth 2.1 or a personal token.
+- **User-owned.** Runs on your Cloudflare account. Export or delete everything at any time.
+- **Agent-driven setup.** Paste one line into any agent and it configures itself, modeled on [Notion's agent setup prompt](https://developers.notion.com/prompts/setup).
+- **Durable, not just a scratchpad.** Memories with supersede history, versioned Markdown documents, reusable skills, and "lessons" (mistakes an agent made with you and what to do instead).
+- **Multi-user and isolated.** Invite-only accounts, per-user vector namespaces, every query scoped by `user_id`.
+
+## Quick start
+
+### Use the hosted version
+
+The hosted instance is an invite-only beta. Join the waitlist at https://context-layer.winter-limit-1658.workers.dev. Once you have an account, paste this into any agent:
+
+```
+Set up my Personal Context Layer by following https://context-layer.winter-limit-1658.workers.dev/setup
+```
+
+The agent connects over MCP, installs custom instructions for when to read and write, creates an Agent Operating Guide, and optionally imports existing context.
+
+### Connect a client manually
+
+| Client type | How |
 |---|---|
-| MCP endpoint `/mcp` | Worker, `createMcpHandler` (stateless, MCP SDK v2) |
-| Auth | `@cloudflare/workers-oauth-provider` (OAuth 2.1, CIMD + DCR) + personal `pcl_…` tokens + PBKDF2 passwords |
-| Accounts, waitlist, invites, memories, documents, skills, settings, activity | D1 |
-| Semantic search | Vectorize (one namespace per user) + Workers AI `@cf/baai/bge-m3`, keyword fallback |
-| OAuth grants | KV `OAUTH_KV` |
-| Daily loop | Cron `0 6 * * *` → per-user "Daily maintenance report" (only for accounts with activity) |
+| OAuth clients (Claude, Cursor, ChatGPT, …) | Add `https://<your-worker>/mcp` as a remote MCP server, sign in, approve |
+| Header-only clients | Create a token under **Settings → Tokens** and send `Authorization: Bearer pcl_…` |
+| Claude Code | `claude mcp add --transport http context https://<your-worker>/mcp` |
 
-## MCP tools
+## Self-hosting
 
-Read: `get_context`, `search`, `get_memory`, `get_document`, `get_document_history`, `list_skills`, `get_skill`
-Write (scope `mcp:write`): `remember`, `update_memory`, `forget`, `save_document`, `add_lesson`, `update_lesson`, `save_skill`, `save_about`, `save_guide`
-
-## Configuration
-
-`wrangler.jsonc` vars: `PUBLIC_URL`, `EMBEDDING_MODEL`, `ADMIN_EMAIL` (bootstrap admin), `EMAIL_FROM` (optional).
-Secrets (`wrangler secret put` / `.dev.vars`): `SESSION_SECRET`, `CONSENT_SECRET`, optional `RESEND_API_KEY`.
-
-## Deploy / upgrade
+You need a Cloudflare account with Workers, D1, KV, Vectorize and Workers AI enabled (all available on the free tier).
 
 ```bash
+git clone https://github.com/kuehlpaul/personal-context-layer.git
+cd personal-context-layer
 npm install
-npm run db:migrate:remote      # 0003 adds accounts (existing data tagged 'owner'), 0004 hardening
+
+# 1. Create the resources and put their IDs into wrangler.jsonc
+npx wrangler d1 create context-layer
+npx wrangler kv namespace create OAUTH_KV
+npx wrangler vectorize create context-layer --dimensions=1024 --metric=cosine
+
+# 2. Set secrets
+npx wrangler secret put SESSION_SECRET      # openssl rand -hex 32
+npx wrangler secret put CONSENT_SECRET      # openssl rand -hex 32
+npx wrangler secret put RESEND_API_KEY      # optional, enables email sending
+
+# 3. Migrate and deploy
+npm run db:migrate:remote
 npx wrangler deploy
 ```
 
-Then open `/join`, sign up with `ADMIN_EMAIL` (no code needed the first time). That account becomes admin, inherits all pre-existing data, re-embeds it into its namespace, and existing OAuth grants keep working. The old `OWNER_PASSWORD` secret is no longer used and can be deleted.
+Then set `PUBLIC_URL` and `ADMIN_EMAIL` in `wrangler.jsonc`, open `https://<your-worker>/join` and sign up with the admin email. The first signup with that address needs no invite code and becomes the admin account.
 
-## Local dev
+### Configuration
+
+| Name | Where | Purpose |
+|---|---|---|
+| `PUBLIC_URL` | `wrangler.jsonc` vars | Public base URL of the Worker, no trailing slash |
+| `ADMIN_EMAIL` | `wrangler.jsonc` vars | May sign up once without an invite and becomes admin |
+| `EMBEDDING_MODEL` | `wrangler.jsonc` vars | Workers AI model for embeddings, default `@cf/baai/bge-m3` |
+| `EMAIL_FROM` | `wrangler.jsonc` vars | Optional sender for invite and reset emails |
+| `SESSION_SECRET` | secret | Signs browser sessions |
+| `CONSENT_SECRET` | secret | Signs the OAuth consent step |
+| `RESEND_API_KEY` | secret | Optional. Without it, invite and reset links are shown in the admin panel to copy manually |
+
+### Upgrading an existing deployment
+
+```bash
+git pull
+npm install
+npm run db:migrate:remote
+npx wrangler deploy
+```
+
+Migrations are additive. `0003` introduces accounts and tags pre-existing single-owner data as `owner`; the `ADMIN_EMAIL` account inherits it on first signup, re-embeds it into its own namespace, and existing OAuth grants keep working. The old `OWNER_PASSWORD` secret is no longer used and can be deleted.
+
+## How it works
+
+```
+┌───────────┐  ┌────────────┐  ┌────────┐  ┌─────────┐
+│  Claude   │  │ Claude Code│  │ Cursor │  │ ChatGPT │   … any MCP client
+└─────┬─────┘  └──────┬─────┘  └───┬────┘  └────┬────┘
+      └───────────────┴────────────┴─────────────┘
+                             │  OAuth 2.1 or pcl_… token
+                             ▼
+                  ┌───────────────────────┐
+                  │   Cloudflare Worker   │  /mcp  · /setup · /ui · /admin
+                  └──┬──────┬──────┬──────┘
+                     │      │      │
+                  ┌──▼─┐ ┌──▼──┐ ┌─▼────────┐
+                  │ D1 │ │ KV  │ │Vectorize │ + Workers AI embeddings
+                  └────┘ └─────┘ └──────────┘
+```
+
+| Concern | Implementation |
+|---|---|
+| MCP endpoint | Worker with `createMcpHandler` (stateless, MCP SDK v2) |
+| Auth | `@cloudflare/workers-oauth-provider` (OAuth 2.1, CIMD + DCR), personal `pcl_…` tokens, PBKDF2 passwords |
+| Storage | D1 for accounts, waitlist, invites, memories, documents, skills, lessons, settings, activity |
+| Semantic search | Vectorize (one namespace per user) + Workers AI `@cf/baai/bge-m3`, keyword fallback when unavailable |
+| OAuth grants | KV `OAUTH_KV` |
+| Daily loop | Cron `0 6 * * *` writes a per-user "Daily maintenance report" (duplicate detection, housekeeping) for accounts with activity |
+
+### Routes
+
+| Path | Who | What |
+|---|---|---|
+| `/` | public | Landing page and waitlist form |
+| `/setup`, `/setup.md` | public | The setup guide agents follow end to end (contains no personal data) |
+| `/join?code=…` | invited | Create an account with an invite code |
+| `/login`, `/logout`, `/forgot`, `/reset` | users | Email + password sessions, password reset |
+| `/ui/…` | users | Memories, documents, skills, lessons, settings (tokens, connected apps, export, delete account), activity |
+| `/admin` | admins | Turn waitlist entries into invites, create or revoke invites, enable, disable or delete accounts |
+| `/mcp` | agents | MCP endpoint. Every token is bound to exactly one account |
+
+## MCP tools
+
+**Read**
+
+| Tool | Description |
+|---|---|
+| `get_context` | Profile, operating guide, exclusions, active lessons, recent memories and documents, available skills. Call once per session. |
+| `search` | Semantic + keyword search across memories, documents, skills and lessons |
+| `get_memory` | One memory by id, including source, dates and supersede history |
+| `get_document` | Full Markdown of a document, optionally an older revision |
+| `get_document_history` | Earlier versions of a document and who wrote them |
+| `list_skills` / `get_skill` | Names of enabled skills, and the full instructions of one |
+
+**Write** (requires scope `mcp:write`)
+
+| Tool | Description |
+|---|---|
+| `remember` | Save one durable memory. Near-duplicates are detected and returned instead of saved |
+| `update_memory` | Edit in place, supersede (keeps history) or archive a memory |
+| `forget` | Permanently delete a memory and block the same content from coming back |
+| `save_document` | Create or update a versioned Markdown document |
+| `add_lesson` / `update_lesson` | Record what went wrong with this user and what every agent should do instead |
+| `save_skill` | Create or update a reusable `SKILL.md`-style skill |
+| `save_about` | Update the short "About me" profile |
+| `save_guide` | Create or replace the Agent Operating Guide |
+
+## Security and access control
+
+- **Waitlist entries grant nothing.** An admin turns one into a single-use invite bound to that email (14 days). Free-form invites with N uses and an optional expiry exist too.
+- **Accounts are isolated.** Every table carries `user_id`, every query in `src/store.ts` filters on it, and vectors live in a per-user Vectorize namespace.
+- **Disabling** an account kills its sessions, tokens and OAuth grants immediately and is checked on every MCP request. **Deleting** removes all rows, vectors and grants. Changing a password signs out every other session.
+- **Legacy grants** from before accounts existed are bound once, at claim time, to the account that adopted the single-owner data, and never re-resolved from roles.
+- Independently audited for cross-account access on 2026-11-07. Findings were fixed in migration `0004` and the matching code.
+
+Found a vulnerability? Please open a private security advisory on GitHub instead of a public issue.
+
+## Development
 
 ```bash
 npm install
-cp .dev.vars.example .dev.vars   # fill in secrets
+cp .dev.vars.example .dev.vars   # fill in the secrets
 npm run db:migrate:local
-npx wrangler dev
+npm run dev                      # http://localhost:8787
 ```
 
-AI + Vectorize need a remote connection (`account_id` in `wrangler.jsonc`). Without them search falls back to keyword matching.
+Workers AI and Vectorize have no local emulation and need a remote connection (`account_id` in `wrangler.jsonc`). Without them, search falls back to keyword matching.
 
-## Connect a client
+| Script | What it does |
+|---|---|
+| `npm run dev` | Local Worker with hot reload |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run types` | Regenerate `worker-configuration.d.ts` from the bindings |
+| `npm run db:migrate:local` / `:remote` | Apply D1 migrations |
+| `npm run deploy` | Deploy to Cloudflare |
 
-Preferred: paste `Set up my Personal Context Layer by following https://<worker>/setup` into any agent and let it drive.
+### Project layout
 
-Manual:
+```
+src/
+  index.ts        Router, OAuth provider wiring, cron entry
+  mcp.ts          MCP server and tool definitions
+  store.ts        All D1 + Vectorize access, bound to one user
+  accounts.ts     Users, passwords, sessions, waitlist, invites, personal tokens
+  auth.ts         OAuth 2.1 server, token auth, login / join / reset pages
+  admin.ts        Admin panel
+  ui.ts           User-facing web app
+  setup.ts        /setup guide content served to agents
+  setup-page.ts   Docs-style HTML shell for /setup
+  landing.ts      Public landing page and waitlist
+  daily.ts        Daily maintenance report (cron)
+  html.ts         Shared HTML helpers and layout
+migrations/       D1 schema, applied in order
+```
 
-- OAuth clients: add `https://<worker>/mcp` as a remote MCP server, sign in, approve.
-- Header-only clients: create a token under Settings → `Authorization: Bearer pcl_…`.
-- Claude Code: `claude mcp add --transport http context https://<worker>/mcp`
+## Contributing
+
+Issues and pull requests are welcome.
+
+1. Fork the repo and create a branch from `main`.
+2. Run `npm run typecheck` before opening a PR.
+3. Schema changes go into a new numbered file in `migrations/`. Never edit an applied migration.
+4. Anything that touches `src/store.ts` must keep filtering on `user_id`.
+
+For larger changes, open an issue first so we can discuss the approach.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+[MIT](LICENSE) © 2026 Paul Kühl
