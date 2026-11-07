@@ -87,8 +87,6 @@ pre{margin:0;padding:12px 16px;border:1px solid var(--border);background:var(--b
 .tr .k{font-family:var(--mono);color:var(--text-3);border-right:1px solid var(--border)}
 .tr .v{color:var(--text)}
 
-footer{display:flex;flex-wrap:wrap;gap:8px 24px;padding:16px 36px 36px;font-family:var(--mono);font-size:var(--xs);line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;color:var(--text-3);border-top:1px solid var(--border)}
-footer a:hover{color:var(--text)}
 
 @media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}.cell:nth-child(3n){border-right:1px solid var(--border)}.cell:nth-child(2n){border-right:0}.cell:nth-last-child(-n+3){border-bottom:1px solid var(--border)}.cell:nth-last-child(-n+2){border-bottom:0}}
 @media (max-width:900px){
@@ -101,7 +99,6 @@ footer a:hover{color:var(--text)}
 .two{grid-template-columns:1fr}.two>div+div{border-left:0;border-top:1px solid var(--border)}
 .grid{grid-template-columns:1fr}.cell{border-right:0!important;border-bottom:1px solid var(--border)!important}.cell:last-child{border-bottom:0!important}
 .tr{grid-template-columns:120px 1fr}
-footer{padding:16px 16px 32px}
 }
 @media (max-width:480px){h1{font-size:36px}.form{gap:20px}.field{width:100%}.tr{grid-template-columns:1fr}.tr .k{border-right:0;border-bottom:1px solid var(--border);padding-bottom:8px}.tr .v{padding-top:8px}}
 `;
@@ -196,7 +193,6 @@ npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View o
 </section>
 
 </div>
-<footer><span>Context Layer</span><a href="${escape(base)}/setup">Setup guide for agents</a><a href="${REPO_URL}" rel="noopener">GitHub</a><a href="/login">Sign in</a></footer>
 </main>
 </div>
 <script>document.getElementById('nav-waitlist').addEventListener('click',function(e){var i=document.getElementById('email');if(i){e.preventDefault();i.scrollIntoView({behavior:'smooth',block:'center'});i.focus({preventScroll:true})}});</script>
