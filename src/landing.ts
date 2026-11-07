@@ -58,13 +58,10 @@ section{display:flex;flex-direction:column;gap:24px}
 .sh{display:flex;align-items:center;gap:16px}
 .sh h2{margin:0;font-size:var(--h2);line-height:18px;white-space:nowrap}
 .sh .line{flex:1;height:1px;background:var(--border)}
-.sh.r{justify-content:flex-end}.sh.r span{font-size:var(--xs);line-height:18px;color:var(--text-3);white-space:nowrap}
 section p{margin:0;font-size:var(--table);line-height:18px}
 section p+p{margin-top:8px}
 code{font-family:var(--mono);font-size:.92em;letter-spacing:0;background:var(--bg-2);padding:1px 5px}
 
-.logos{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px}
-.logos span{font-family:var(--mono);font-size:var(--xs);line-height:20px;color:var(--text-2);white-space:nowrap}
 
 .grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
 .cell{display:flex;flex-direction:column;gap:8px;padding:16px 16px 56px;min-width:0;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}
@@ -186,11 +183,6 @@ ${form}
 cd personal-context-layer &amp;&amp; npm install
 npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View on GitHub ${ARROW_UP_RIGHT}</a></div>
 </div>
-</section>
-
-<section>
-<div class="sh r"><span class="line"></span><span class="mono">Works with following agents</span></div>
-<div class="logos"><span>Claude</span><span>Claude Code</span><span>ChatGPT</span><span>Codex</span><span>Cursor</span><span>Windsurf</span><span>Gemini CLI</span><span>Any MCP client</span></div>
 </section>
 
 <section id="features">
