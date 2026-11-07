@@ -36,8 +36,6 @@ h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weigh
 .field .plus{position:absolute;right:-10px;bottom:-10px;width:8px;height:8px;font:8px/8px var(--mono);color:var(--border);text-align:center;pointer-events:none}
 .field input{display:block;width:100%;margin:0;padding:8px 20px;border:0;background:transparent;color:var(--text);font:500 14px/20px var(--sans);letter-spacing:0;outline:0}
 .field input::placeholder{color:var(--text-3)}
-.field:focus-within::before,.field:focus-within::after{border-color:var(--text)}
-.field:focus-within .plus{color:var(--text)}
 .btn{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border:0;background:var(--text);color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:500;line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;cursor:pointer;white-space:nowrap}
 .btn:hover{opacity:.85}
 .hint{margin:0;font-size:var(--xs);line-height:16px;color:var(--text-3);max-width:454px}
