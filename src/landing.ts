@@ -144,7 +144,7 @@ export function landingHtml(base: string, state: { joined?: boolean; error?: str
 			<label class="hp" aria-hidden="true">Website <input name="website" tabindex="-1" autocomplete="off"></label>
 			<button class="btn" type="submit">Join waitlist</button>
 		</form>
-		${state.error ? `<p class="hint err">${escape(state.error)}</p>` : `<p class="hint">Hosted beta is invite-only while we're small. No newsletter, no sharing of your email.<br>Prefer to run it yourself? <a href="${REPO_URL}" style="color:var(--text);border-bottom:1px solid var(--border)">It's open source.</a></p>`}`;
+		${state.error ? `<p class="hint err">${escape(state.error)}</p>` : `<p class="hint">Hosted beta is invite-only while we're small. No newsletter, no sharing of your email. Prefer to run it yourself? <a href="${REPO_URL}" style="color:var(--text);border-bottom:1px solid var(--border)">It's open source.</a></p>`}`;
 
 	const features = FEATURES.map(([title, text], i) => `<div class="cell"><span class="n">${String(i + 1).padStart(2, "0")}</span><h3>${escape(title)}</h3><p>${escape(text)}</p></div>`).join("");
 	const infra = INFRA.map(([k, v]) => `<div class="tr"><div class="k">${escape(k)}</div><div class="v">${escape(v)}</div></div>`).join("");
