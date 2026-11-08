@@ -7,15 +7,19 @@
 	// global_fetch_strictly_public: required for OAuth Client ID Metadata Documents (server fetches client URLs)
 	"compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
 	"observability": { "enabled": true },
-	// context.talktopepe.com is a Worker custom domain (DNS + cert managed by Cloudflare). The workers.dev URL stays
-	// on as an alias and redirects. The apex talktopepe.com is added here once it is moved off the pepe-app Worker.
-	"routes": [{ "pattern": "context.talktopepe.com", "custom_domain": true }],
+	// Worker custom domains (DNS + cert managed by Cloudflare): the app on context.talktopepe.com, the landing page on
+	// the apex (www redirects to it). The workers.dev URL stays on as an alias and redirects.
+	"routes": [
+		{ "pattern": "context.talktopepe.com", "custom_domain": true },
+		{ "pattern": "talktopepe.com", "custom_domain": true },
+		{ "pattern": "www.talktopepe.com", "custom_domain": true }
+	],
 	"workers_dev": true,
 	"vars": {
 		// Public base URL of this Worker, no trailing slash. Overridden in .dev.vars for local dev.
 		"PUBLIC_URL": "https://context.talktopepe.com",
 		// Optional marketing host that serves only the landing page + waitlist (no scheme). Empty = landing lives on PUBLIC_URL.
-		"LANDING_HOST": "",
+		"LANDING_HOST": "talktopepe.com",
 		"EMBEDDING_MODEL": "@cf/baai/bge-m3",
 		// The account with this email may sign up without an invite, becomes admin, and inherits data from the single-owner era.
 		"ADMIN_EMAIL": "paul_kuehl@icloud.com",
