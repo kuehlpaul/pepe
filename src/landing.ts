@@ -1,5 +1,5 @@
 // Public start page: what the product is, and the waitlist form. No personal data is shown here.
-// Layout follows the "New Design" artboard in the Paper file "Context Layer – Screens & UI":
+// Layout follows the "New Design" artboard in the Paper file "Context Layer – Screens & UI" (the product is now Pepe):
 // a sticky left panel (badge, headline, waitlist form) and a scrolling right column with a
 // three-cell nav, ruled section headers, a 1px-bordered feature grid and an infrastructure table.
 import { escape } from "./html";
@@ -97,7 +97,7 @@ const FEATURES: Array<[string, string]> = [
 	["Lessons", "When you correct an agent, the correction becomes guidance every other agent receives the moment it connects. Mistakes are made once."],
 	["Skills", "Reusable, SKILL.md-style instructions. Any agent lists them, loads the one that applies to the task and follows it."],
 	["Search", "Semantic search over everything you've stored, plus keyword fallback. Agents call it before working on anything personal."],
-	["Your rules", "Tell it what must never be stored. Forgotten content is blocked from being re-saved. Every write by every agent is logged and visible to you."],
+	["Your rules", "Tell Pepe what must never be stored. Forgotten content is blocked from being re-saved. Every write by every agent is logged and visible to you."],
 ];
 
 const INFRA: Array<[string, string]> = [
@@ -125,15 +125,15 @@ export function landingHtml(base: string, state: { joined?: boolean; error?: str
 	const infra = INFRA.map(([k, v]) => `<div class="tr"><div class="k">${escape(k)}</div><div class="v">${escape(v)}</div></div>`).join("");
 
 	return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Context Layer · One memory for every AI agent you use</title>
-<meta name="description" content="A personal context layer: one remote MCP server that gives Claude, ChatGPT, Cursor, Claude Code and any other agent the same durable memory about you. You own the data.">
+<title>Pepe · Your second brain for every AI agent</title>
+<meta name="description" content="Pepe is your second brain. It remembers everything you do with an AI agent and helps Claude, ChatGPT, Cursor, Claude Code and any other agent remember your decisions. One remote MCP server, your data.">
 ${FONT_LINKS}
 <style>${CSS}</style></head><body>
 <div class="page">
 <aside class="panel">
-<a class="logo" href="/" aria-label="Context Layer">${LOGO}</a>
+<a class="logo" href="/" aria-label="Pepe">${LOGO}</a>
 <span class="badge"><span class="dim">Private beta</span><span class="sep"></span><b>Invite only ${ARROW_RIGHT}</b></span>
-<h1>One memory for every AI agent.</h1>
+<h1>Your second brain for every AI agent.</h1>
 ${form}
 </aside>
 <div class="rule-v"></div>
@@ -149,7 +149,7 @@ ${form}
 <section id="readme">
 <div class="sh"><h2 class="mono">Readme</h2><span class="line"></span></div>
 <div>
-<p>Context Layer is a personal memory that Claude, ChatGPT, Cursor, Claude Code and any other MCP-capable agent can read and write. Switch tools without re-explaining yourself: what one agent learned, the next one knows. Your context stays yours, not the vendor's.</p>
+<p>Pepe is your second brain. It remembers everything you do with an agent: the decisions you make, what you prefer, what went wrong and what you're working on. Claude, ChatGPT, Cursor, Claude Code and any other MCP-capable agent connect to the same Pepe, so what one agent learns the next one already knows. Your context stays yours, not the vendor's.</p>
 <p>It's open source. Run the hosted version (invite-only beta, join the waitlist) or deploy your own copy on your Cloudflare account in a few minutes. Same code, same features, either way the data is yours.</p>
 <p>Connect an agent in one step by sharing the setup guide with it. It connects over MCP with OAuth, installs a short set of custom instructions and knows when to read and when to save. From then on every session starts with <code>get_context</code> and <code>search</code>, and ends with what's worth remembering.</p>
 </div>
@@ -158,9 +158,9 @@ ${form}
 <section id="get-it">
 <div class="sh"><h2 class="mono">Hosted or self-hosted</h2><span class="line"></span></div>
 <div class="two">
-<div><span class="tag">01 · Hosted</span><h3>Use the hosted version</h3><p>We run it on Cloudflare. Accounts are isolated, every write is logged, and you can export or delete everything at any time. Invite-only while the beta is small.</p><a class="cta" href="#waitlist">Join the waitlist ${ARROW_RIGHT}</a></div>
-<div><span class="tag">02 · Self-hosted</span><h3>Deploy your own</h3><p>Clone the repository, create the Cloudflare resources listed in the README and deploy. Your account, your Worker, your data.</p><pre>git clone ${REPO_URL}.git
-cd personal-context-layer &amp;&amp; npm install
+<div><span class="tag">01 · Hosted</span><h3>Use the hosted Pepe</h3><p>We run it on Cloudflare. Accounts are isolated, every write is logged, and you can export or delete everything at any time. Invite-only while the beta is small.</p><a class="cta" href="#waitlist">Join the waitlist ${ARROW_RIGHT}</a></div>
+<div><span class="tag">02 · Self-hosted</span><h3>Run your own Pepe</h3><p>Clone the repository, create the Cloudflare resources listed in the README and deploy. Your account, your Worker, your data.</p><pre>git clone ${REPO_URL}.git
+cd pepe-brain &amp;&amp; npm install
 npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View on GitHub ${ARROW_UP_RIGHT}</a></div>
 </div>
 </section>

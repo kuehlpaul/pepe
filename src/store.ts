@@ -640,7 +640,7 @@ export class Store {
 		const all = async <T>(sql: string) => (await this.db.prepare(sql).bind(this.u).all<T>()).results;
 		return {
 			exported_at: now(),
-			format: "personal-context-layer/v1",
+			format: "pepe/v1",
 			settings: Object.fromEntries((await all<{ key: string; value: string }>("SELECT key, value FROM settings WHERE user_id = ?")).map((s) => [s.key, s.value])),
 			exclusions: await all("SELECT id, rule, created_at FROM exclusions WHERE user_id = ? ORDER BY created_at"),
 			memories: await all<Memory>("SELECT * FROM memories WHERE user_id = ? ORDER BY created_at"),

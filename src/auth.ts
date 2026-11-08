@@ -58,7 +58,7 @@ export const authorizationServer = new OAuthAuthorizationServer<Env>({
 });
 
 export const resourceServer = new OAuthResourceServer<Env, AuthProps>({
-	resourceMetadata: { resource: MCP_RESOURCE, authorization_servers: [publicUrl()], resource_name: "Personal Context Layer" },
+	resourceMetadata: { resource: MCP_RESOURCE, authorization_servers: [publicUrl()], resource_name: "Pepe" },
 	requiredScopes: ["mcp:read"],
 	validateToken: (env) => async (resource, token) => {
 		try {
@@ -161,7 +161,7 @@ function loginPage(next: string, email = "", error?: string) {
 	return layout(
 		"Sign in",
 		`<form method="post" action="/login?next=${encodeURIComponent(next)}" class="card narrow">
-			<span class="badge"><span class="dim">Context Layer</span><span class="sep"></span><b>Sign in</b></span>
+			<span class="badge"><span class="dim">Pepe</span><span class="sep"></span><b>Sign in</b></span>
 			<h1>Welcome back.</h1>
 			${error ? `<p class="error">${escape(error)}</p>` : ""}
 			<label>Email <input type="email" name="email" value="${escape(email)}" autocomplete="email" autofocus required></label>
@@ -220,7 +220,7 @@ function joinPage(v: { code: string; email?: string; name?: string; error?: stri
 		`<form method="post" action="/join" class="card narrow">
 			<span class="badge"><span class="dim">Private beta</span><span class="sep"></span><b>Invite only</b></span>
 			<h1>Create your account.</h1>
-			<p class="muted">Context Layer is invite-only right now. Your data stays yours: export or delete it any time.</p>
+			<p class="muted">Pepe is invite-only right now. Your data stays yours: export or delete it any time.</p>
 			${v.error ? `<p class="error">${escape(v.error)}</p>` : ""}
 			${hasCode ? `<input type="hidden" name="code" value="${escape(v.code)}">` : `<label>Invite code <input name="code" placeholder="From your invite link" required autofocus></label>`}
 			<label>Email <input type="email" name="email" value="${escape(v.email)}" autocomplete="email" required ${hasCode ? "autofocus" : ""}></label>
@@ -256,7 +256,7 @@ export async function handleForgot(request: Request): Promise<Response> {
 	if (user && user.status === "active") {
 		const link = await createPasswordReset(user.id, 2);
 		try {
-			await sendEmail(user.email, "Reset your Context Layer password", `Hi ${user.name || ""},\n\nReset your password here (valid for 2 hours):\n${link}\n\nIf you did not ask for this, ignore this email.`);
+			await sendEmail(user.email, "Reset your Pepe password", `Hi ${user.name || ""},\n\nReset your password here (valid for 2 hours):\n${link}\n\nIf you did not ask for this, ignore this email.`);
 		} catch (err) {
 			console.error("reset email failed", String(err));
 		}

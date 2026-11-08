@@ -73,8 +73,8 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 			try {
 				await sendEmail(
 					invite.email,
-					"Your invite to Context Layer",
-					`Hi,\n\nYou're in. Create your Context Layer account with this personal link${invite.expires_at ? ` (valid until ${invite.expires_at.slice(0, 10)})` : ""}:\n${inviteLink(invite)}\n\nAfter signing up, open the setup guide and share it with your agent: ${publicUrl()}/setup\n\nSee you inside.`,
+					"Your invite to Pepe",
+					`Hi,\n\nYou're in. Create your Pepe account with this personal link${invite.expires_at ? ` (valid until ${invite.expires_at.slice(0, 10)})` : ""}:\n${inviteLink(invite)}\n\nAfter signing up, open the setup guide and share it with your agent: ${publicUrl()}/setup\n\nSee you inside.`,
 				);
 				await store.log("admin_email_invite", id, invite.email);
 				return back({ msg: `Invite emailed to ${invite.email}.` });

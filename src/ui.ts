@@ -43,7 +43,7 @@ export async function handleUi(request: Request, env: Env, user: User): Promise<
 	const form = post ? (isForm ? await request.formData() : new FormData()) : null;
 	const f = (k: string) => (form?.get(k) == null ? undefined : String(form.get(k)));
 	const base = env.PUBLIC_URL.replace(/\/$/, "");
-	const setupPrompt = `<input class="mono" readonly value="Set up my Personal Context Layer by following ${escape(base)}/setup" onclick="this.select()">`;
+	const setupPrompt = `<input class="mono" readonly value="Set up Pepe by following ${escape(base)}/setup" onclick="this.select()">`;
 
 	// ---------- overview ----------
 	if (path === "/ui") {
@@ -227,7 +227,7 @@ export async function handleUi(request: Request, env: Env, user: User): Promise<
 	if (path === "/ui/export") {
 		await store.log("export");
 		return new Response(JSON.stringify(await store.exportAll(), null, 2), {
-			headers: { "Content-Type": "application/json; charset=utf-8", "Content-Disposition": `attachment; filename="context-layer-export-${new Date().toISOString().slice(0, 10)}.json"` },
+			headers: { "Content-Type": "application/json; charset=utf-8", "Content-Disposition": `attachment; filename="pepe-export-${new Date().toISOString().slice(0, 10)}.json"` },
 		});
 	}
 

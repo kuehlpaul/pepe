@@ -148,12 +148,12 @@ const NAV: Array<[string, string]> = [
 export function layout(title: string, body: string, user?: User | null, current = "") {
 	const isActive = (href: string) => (href === "/ui" ? current === "/ui" : current === href || current.startsWith(href + "/"));
 	const header = user
-		? `<header class="top"><a class="brand" href="/ui">${LOGO}Context Layer</a><nav aria-label="App">${NAV.map(([href, label]) => `<a href="${href}"${isActive(href) ? ' class="active"' : ""}>${label}</a>`).join("")}${
+		? `<header class="top"><a class="brand" href="/ui">${LOGO}Pepe</a><nav aria-label="App">${NAV.map(([href, label]) => `<a href="${href}"${isActive(href) ? ' class="active"' : ""}>${label}</a>`).join("")}${
 				user.role === "admin" ? `<a href="/admin"${isActive("/admin") ? ' class="active"' : ""}>Admin</a>` : ""
 			}</nav><span class="spacer"></span><span class="who">${escape(user.email)}</span><a class="out" href="/logout">Sign out</a></header>`
-		: `<header class="top"><a class="brand" href="/">${LOGO}Context Layer</a><span class="spacer"></span><nav aria-label="Site"><a href="/setup">Docs</a><a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a><a href="/login"${current === "/login" ? ' class="active"' : ""}>Sign in</a></nav></header>`;
+		: `<header class="top"><a class="brand" href="/">${LOGO}Pepe</a><span class="spacer"></span><nav aria-label="Site"><a href="/setup">Docs</a><a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a><a href="/login"${current === "/login" ? ' class="active"' : ""}>Sign in</a></nav></header>`;
 	return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${escape(title)} · Context Layer</title>
+<title>${escape(title)} · Pepe</title>
 ${FONT_LINKS}
 <style>${CSS}</style></head><body>
 ${header}

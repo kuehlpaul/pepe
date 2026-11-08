@@ -1,10 +1,10 @@
 <div align="center">
 
-# Context Layer
+# Pepe
 
-**One memory for every AI agent.**
+**Your second brain for every AI agent.**
 
-A self-hostable, remote [MCP](https://modelcontextprotocol.io) server that gives every agent you use (Claude, Claude Code, Cursor, ChatGPT, …) the same durable memory about you. Vendor-independent. Your data, on your own Cloudflare account.
+Pepe remembers everything you do with an agent and helps every agent you use remember your decisions. It is a self-hostable, remote [MCP](https://modelcontextprotocol.io) server that gives Claude, Claude Code, Cursor, ChatGPT and any other agent the same durable memory about you. Vendor-independent. Your data, on your own Cloudflare account.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Cloudflare Workers](https://img.shields.io/badge/runs%20on-Cloudflare%20Workers-F38020?logo=cloudflare&logoColor=white)](https://workers.cloudflare.com)
@@ -12,7 +12,7 @@ A self-hostable, remote [MCP](https://modelcontextprotocol.io) server that gives
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![PRs welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](#contributing)
 
-[Hosted beta](https://context-layer.winter-limit-1658.workers.dev) · [Self-host](#self-hosting) · [MCP tools](#mcp-tools) · [Contributing](#contributing)
+[talktopepe.com](https://talktopepe.com) · [Setup guide](https://context.talktopepe.com/setup) · [Self-host](#self-hosting) · [MCP tools](#mcp-tools) · [Contributing](#contributing)
 
 </div>
 
@@ -20,7 +20,7 @@ A self-hostable, remote [MCP](https://modelcontextprotocol.io) server that gives
 
 ## Why
 
-Every agent you use keeps its own notes about you, and none of them talk to each other. Switch from Claude to Cursor to ChatGPT and you start from zero each time. Context Layer is a single MCP endpoint that all of them connect to, so a lesson learned in one tool applies in every other.
+Every agent you use keeps its own notes about you, and none of them talk to each other. Switch from Claude to Cursor to ChatGPT and you start from zero each time. Pepe is the one place they all remember into: the decisions you made, what you prefer, what went wrong and what you are working on. A lesson learned in one tool applies in every other.
 
 - **Vendor-independent.** Works with any MCP client via OAuth 2.1 or a personal token.
 - **User-owned.** Runs on your Cloudflare account. Export or delete everything at any time.
@@ -30,37 +30,37 @@ Every agent you use keeps its own notes about you, and none of them talk to each
 
 ## Quick start
 
-### Use the hosted version
+### Use the hosted Pepe
 
-The hosted instance is an invite-only beta. Join the waitlist at https://context-layer.winter-limit-1658.workers.dev. Once you have an account, paste this into any agent:
+The hosted instance is an invite-only beta. Join the waitlist at https://talktopepe.com. Once you have an account, paste this into any agent:
 
 ```
-Set up my Personal Context Layer by following https://context-layer.winter-limit-1658.workers.dev/setup
+Set up Pepe by following https://context.talktopepe.com/setup
 ```
 
-The agent connects over MCP, installs custom instructions for when to read and write, creates an Agent Operating Guide, and optionally imports existing context.
+The agent connects over MCP, installs custom instructions for when to read and write, creates an Agent Operating Guide, and optionally imports what it already knows about you.
 
 ### Connect a client manually
 
 | Client type | How |
 |---|---|
-| OAuth clients (Claude, Cursor, ChatGPT, …) | Add `https://<your-worker>/mcp` as a remote MCP server, sign in, approve |
+| OAuth clients (Claude, Cursor, ChatGPT, …) | Add `https://<your-pepe>/mcp` as a remote MCP server, sign in, approve |
 | Header-only clients | Create a token under **Settings → Tokens** and send `Authorization: Bearer pcl_…` |
-| Claude Code | `claude mcp add --transport http context https://<your-worker>/mcp` |
+| Claude Code | `claude mcp add --transport http pepe https://<your-pepe>/mcp` |
 
 ## Self-hosting
 
 You need a Cloudflare account with Workers, D1, KV, Vectorize and Workers AI enabled (all available on the free tier).
 
 ```bash
-git clone https://github.com/kuehlpaul/personal-context-layer.git
-cd personal-context-layer
+git clone https://github.com/kuehlpaul/pepe-brain.git
+cd pepe-brain
 npm install
 
-# 1. Create the resources and put their IDs into wrangler.jsonc
-npx wrangler d1 create context-layer
+# 1. Create the resources and put their names and IDs into wrangler.jsonc
+npx wrangler d1 create pepe
 npx wrangler kv namespace create OAUTH_KV
-npx wrangler vectorize create context-layer --dimensions=1024 --metric=cosine
+npx wrangler vectorize create pepe --dimensions=1024 --metric=cosine
 
 # 2. Set secrets
 npx wrangler secret put SESSION_SECRET      # openssl rand -hex 32
@@ -72,13 +72,14 @@ npm run db:migrate:remote
 npx wrangler deploy
 ```
 
-Then set `PUBLIC_URL` and `ADMIN_EMAIL` in `wrangler.jsonc`, open `https://<your-worker>/join` and sign up with the admin email. The first signup with that address needs no invite code and becomes the admin account.
+Then set `PUBLIC_URL` and `ADMIN_EMAIL` in `wrangler.jsonc`, open `https://<your-pepe>/join` and sign up with the admin email. The first signup with that address needs no invite code and becomes the admin account.
 
 ### Configuration
 
 | Name | Where | Purpose |
 |---|---|---|
-| `PUBLIC_URL` | `wrangler.jsonc` vars | Public base URL of the Worker, no trailing slash |
+| `PUBLIC_URL` | `wrangler.jsonc` vars | Public base URL of the app, no trailing slash |
+| `LANDING_HOST` | `wrangler.jsonc` vars | Optional separate host for the landing page and waitlist. Empty = landing lives on `PUBLIC_URL` |
 | `ADMIN_EMAIL` | `wrangler.jsonc` vars | May sign up once without an invite and becomes admin |
 | `EMBEDDING_MODEL` | `wrangler.jsonc` vars | Workers AI model for embeddings, default `@cf/baai/bge-m3` |
 | `EMAIL_FROM` | `wrangler.jsonc` vars | Optional sender for invite and reset emails |
@@ -117,7 +118,7 @@ Migrations are additive. `0003` introduces accounts and tags pre-existing single
 
 | Concern | Implementation |
 |---|---|
-| MCP endpoint | Worker with `createMcpHandler` (stateless, MCP SDK v2) |
+| MCP endpoint | Worker with `createMcpHandler` (stateless, MCP SDK v2), server name `pepe` |
 | Auth | `@cloudflare/workers-oauth-provider` (OAuth 2.1, CIMD + DCR), personal `pcl_…` tokens, PBKDF2 passwords |
 | Storage | D1 for accounts, waitlist, invites, memories, documents, skills, lessons, settings, activity |
 | Semantic search | Vectorize (one namespace per user) + Workers AI `@cf/baai/bge-m3`, keyword fallback when unavailable |
@@ -128,7 +129,7 @@ Migrations are additive. `0003` introduces accounts and tags pre-existing single
 
 | Path | Who | What |
 |---|---|---|
-| `/` | public | Landing page and waitlist form |
+| `/` | public | Landing page and waitlist form (served on `LANDING_HOST` when set) |
 | `/setup`, `/setup.md` | public | The setup guide agents follow end to end (contains no personal data) |
 | `/join?code=…` | invited | Create an account with an invite code |
 | `/login`, `/logout`, `/forgot`, `/reset` | users | Email + password sessions, password reset |
@@ -189,7 +190,7 @@ Workers AI and Vectorize have no local emulation and need a remote connection (`
 | `npm run dev` | Local Worker with hot reload |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run types` | Regenerate `worker-configuration.d.ts` from the bindings |
-| `npm run db:migrate:local` / `:remote` | Apply D1 migrations |
+| `npm run db:migrate:local` / `:remote` | Apply D1 migrations to the `DB` binding |
 | `npm run deploy` | Deploy to Cloudflare |
 
 ### Project layout
@@ -208,6 +209,7 @@ src/
   landing.ts      Public landing page and waitlist
   daily.ts        Daily maintenance report (cron)
   html.ts         Shared HTML helpers and layout
+  theme.ts        Design tokens, Pepe logo, repo URL
 migrations/       D1 schema, applied in order
 ```
 

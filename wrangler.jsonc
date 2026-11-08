@@ -1,5 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
+	// Pepe. The Worker, D1 database and Vectorize index keep their original resource name "context-layer":
+	// Cloudflare resources cannot be renamed in place, and the custom domains are attached to this Worker.
 	"name": "context-layer",
 	"account_id": "e21c755b035151eb1a092ee1de22ef20", // Personal
 	"main": "src/index.ts",

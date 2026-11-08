@@ -25,7 +25,7 @@ function slugify(text: string) {
 
 function parseSetupMarkdown(md: string): ParsedSetup {
 	const lines = md.replace(/\r\n/g, "\n").split("\n");
-	let title = "Set up the Personal Context Layer for your agent";
+	let title = "Set up Pepe for your agent";
 	let description = "";
 	let note = "";
 	let i = 0;
@@ -242,8 +242,8 @@ export function setupPageHtml(baseUrl: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>${escape(parsed.title)} · Context Layer</title>
-<meta name="description" content="${escape(parsed.description || "Set up the Personal Context Layer as durable, shared context for your agents.")}">
+<title>${escape(parsed.title)} · Pepe</title>
+<meta name="description" content="${escape(parsed.description || "Set up Pepe, the second brain your agents share.")}">
 <meta name="x-setup-version" content="${escape(SETUP_VERSION)}">
 <link rel="alternate" type="text/markdown" href="${escape(base)}/setup.md">
 ${FONT_LINKS}
@@ -251,7 +251,7 @@ ${FONT_LINKS}
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="${escape(base)}/"><span class="brand-mark">${LOGO}</span> Context Layer <span class="word">Docs</span></a>
+  <a class="brand" href="${escape(base)}/"><span class="brand-mark">${LOGO}</span> Pepe <span class="word">Docs</span></a>
   <nav class="top-links" aria-label="Sections">
     <a class="active" href="${escape(base)}/setup">Docs</a>
     <a href="${escape(base)}/ui">App</a>
@@ -265,12 +265,12 @@ ${FONT_LINKS}
 <div class="layout">
   <aside class="sidebar" aria-label="Sidebar">
     <h2>Prompts</h2>
-    <a class="nav-pill" href="${escape(base)}/setup">Set up Context Layer for your agent</a>
+    <a class="nav-pill" href="${escape(base)}/setup">Set up Pepe for your agent</a>
     <a class="side-link active" href="${escape(base)}/setup">Setup prompt</a>
     <a class="side-link" href="#changelog">Changelog</a>
   </aside>
   <main class="main" id="content">
-    <p class="eyebrow">Set up Context Layer for your agent</p>
+    <p class="eyebrow">Set up Pepe for your agent</p>
     <h1>${escape(parsed.title)}</h1>
     ${parsed.description ? `<p class="lede">${escape(parsed.description)}</p>` : ""}
     <div class="hero-actions">
