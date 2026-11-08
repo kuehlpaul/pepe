@@ -20,7 +20,7 @@ export default {
 		const base = env.PUBLIC_URL.replace(/\/$/, "");
 		const html = { "Content-Type": "text/html; charset=utf-8" };
 		// Optional marketing host (LANDING_HOST): serves only the landing page and the waitlist. The app, docs, OAuth
-		// and MCP live on PUBLIC_URL. Any other hostname (e.g. the workers.dev one) is an alias and redirects.
+		// and MCP live on PUBLIC_URL; the workers.dev hostname is an alias and redirects there.
 		const landingHost = env.LANDING_HOST || "";
 		const landingBase = landingHost ? `https://${landingHost}` : base;
 		const moved = (to: string) => Response.redirect(to, request.method === "GET" || request.method === "HEAD" ? 301 : 308);
@@ -30,7 +30,9 @@ export default {
 			if (pathname === "/waitlist") return handleWaitlist(request, base, landingBase);
 			return moved(`${base}${pathname}${url.search}`);
 		}
-		if (url.hostname !== new URL(base).hostname) return moved(`${base}${pathname}${url.search}`);
+		// The workers.dev URL is an alias of PUBLIC_URL. (Only that one: `wrangler dev` rewrites the request host to the
+		// first custom domain, so comparing against PUBLIC_URL would redirect every local request.)
+		if (url.hostname.endsWith(".workers.dev")) return moved(`${base}${pathname}${url.search}`);
 
 		// MCP endpoint (+ RFC 9728 protected resource metadata)
 		if (pathname === "/mcp" || pathname.startsWith("/mcp/") || pathname.startsWith("/.well-known/oauth-protected-resource")) {

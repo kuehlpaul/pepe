@@ -3,7 +3,7 @@
 // a sticky left panel (badge, headline, waitlist form) and a scrolling right column with a
 // three-cell nav, ruled section headers, a 1px-bordered feature grid and an infrastructure table.
 import { escape } from "./html";
-import { ARROW_RIGHT, ARROW_UP_RIGHT, BASE_CSS, FONT_LINKS, REPO_URL } from "./theme";
+import { ARROW_RIGHT, ARROW_UP_RIGHT, BASE_CSS, FONT_LINKS, REPO_URL, LOGO } from "./theme";
 import { isEmail, joinWaitlist, normalizeEmail } from "./accounts";
 
 const CSS = `
@@ -17,6 +17,8 @@ ${BASE_CSS}
 .content{flex:0 0 60%;width:60%;display:flex;flex-direction:column}
 
 /* Left panel */
+.logo{position:absolute;top:24px;left:32px;width:36px;height:36px;display:block}
+.logo svg{display:block;width:100%;height:100%}
 h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weight:500;line-height:1.1;letter-spacing:-.03em}
 .form{display:flex;align-items:center;gap:24px;padding-top:16px;flex-wrap:wrap}
 .field{position:relative;width:250px;max-width:100%}
@@ -36,7 +38,7 @@ h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weigh
 .nav a{flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:16px;padding:16px;font-size:var(--table);line-height:18px}
 .nav a+a{border-left:1px solid var(--border)}
 .nav a:hover{background:var(--bg-2)}
-.nav a.cta,.nav a.cta:hover{background:var(--text);color:var(--bg)}
+.nav a.cta,.nav a.cta:hover{background:var(--accent);color:var(--accent-fg)}
 .nav svg{width:16px;height:16px;flex:none}
 
 /* Right column: sections */
@@ -75,6 +77,7 @@ pre{margin:0;padding:12px 16px;border:1px solid var(--border);background:var(--b
 @media (max-width:900px){
 .page{flex-direction:column}
 .panel{position:static;height:auto;min-height:min(60vh,560px);padding:56px 24px 48px}
+.logo{left:24px}
 .rule-v{flex:0 0 1px;height:1px;width:100%}
 .content{flex:1 1 auto;width:100%}
 .body{padding:24px 16px;gap:28px}
@@ -128,6 +131,7 @@ ${FONT_LINKS}
 <style>${CSS}</style></head><body>
 <div class="page">
 <aside class="panel">
+<a class="logo" href="/" aria-label="Context Layer">${LOGO}</a>
 <span class="badge"><span class="dim">Private beta</span><span class="sep"></span><b>Invite only ${ARROW_RIGHT}</b></span>
 <h1>One memory for every AI agent.</h1>
 ${form}

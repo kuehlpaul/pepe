@@ -4,7 +4,12 @@
 
 export const REPO_URL = "https://github.com/kuehlpaul/personal-context-layer";
 
-export const FONT_LINKS = `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+/** Brand mark (the blue face from the Paper file), sized by CSS on the parent. */
+const LOGO_PATH = "M471.412,746.216C471.412,602.047 617.993,485 798.538,485C936.602,485 1054.804,553.446 1102.785,650.125C1147.986,618.086 1207.471,598.619 1272.605,598.619C1413.886,598.619 1528.588,690.21 1528.588,803.026L1528.588,1515L471.412,1515L471.412,746.216ZM901.5,780C846.584,780 802,824.584 802,879.5L802,1018.5C802,1073.416 846.584,1118 901.5,1118C956.416,1118 1001,1073.416 1001,1018.5L1001,879.5C1001,824.584 956.416,780 901.5,780ZM1274.5,780C1219.584,780 1175,824.584 1175,879.5L1175,1018.5C1175,1073.416 1219.584,1118 1274.5,1118C1329.416,1118 1374,1073.416 1374,1018.5L1374,879.5C1374,824.584 1329.416,780 1274.5,780Z";
+export const LOGO = `<svg viewBox="471 485 1058 1030" aria-hidden="true"><path d="${LOGO_PATH}" fill="#007aff" fill-rule="evenodd"/></svg>`;
+const FAVICON = `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="471 485 1058 1030"><path d="${LOGO_PATH}" fill="#007aff" fill-rule="evenodd"/></svg>`)}`;
+
+export const FONT_LINKS = `<link rel="icon" href="${FAVICON}"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">`;
 
 export const ARROW_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.787 8.667H2.667V7.333h8.12L7.053 3.6 8 2.667l5.333 5.333L8 13.333l-.947-.933 3.734-3.733Z" fill="currentColor"/></svg>`;
@@ -13,14 +18,14 @@ export const ARROW_UP_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path
 /** Mono, uppercase, tracked: the label style used for nav items, section headers, tags and form labels. */
 export const LABEL = `font-family:var(--mono);font-weight:500;letter-spacing:var(--wide);text-transform:uppercase`;
 
-/** Declarations shared by <button> and .btn (black block, mono uppercase, no radius). */
-export const BTN = `display:inline-flex;align-items:center;justify-content:center;gap:4px;margin:0;padding:8px 16px;border:0;border-radius:0;background:var(--text);color:var(--bg);${LABEL};font-size:11px;line-height:18px;cursor:pointer;white-space:nowrap;text-decoration:none;appearance:none;-webkit-appearance:none`;
+/** Declarations shared by <button> and .btn (blue block, mono uppercase, no radius). */
+export const BTN = `display:inline-flex;align-items:center;justify-content:center;gap:4px;margin:0;padding:8px 16px;border:0;border-radius:0;background:var(--accent);color:var(--accent-fg);${LABEL};font-size:11px;line-height:18px;cursor:pointer;white-space:nowrap;text-decoration:none;appearance:none;-webkit-appearance:none`;
 
 export const BASE_CSS = `
-:root{--bg:#fff;--bg-2:#f7f7f5;--text:#0f0f0f;--text-2:#5c5c5c;--text-3:#8a8a8a;--border:#e8e8e8;--ok-bg:#e6f4ea;--ok-fg:#1e4620;--warn-bg:#fff4e0;--warn-fg:#5c3d00;--danger:#c92a2a;
+:root{--bg:#fff;--bg-2:#f7f7f5;--text:#0f0f0f;--text-2:#5c5c5c;--text-3:#8a8a8a;--border:#e8e8e8;--ok-bg:#e6f4ea;--ok-fg:#1e4620;--warn-bg:#fff4e0;--warn-fg:#5c3d00;--danger:#c92a2a;--accent:#007aff;--accent-fg:#fff;
 --sans:Geist,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
 --xs:12.5px;--table:14px;--base:16px;--h2:17.6px;--display:48px;--wide:.04em;color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#0f0f0f;--bg-2:#171717;--text:#ededed;--text-2:#a3a3a3;--text-3:#737373;--border:#262626;--ok-bg:#1d3324;--ok-fg:#c8e6cf;--warn-bg:#3a2e14;--warn-fg:#f5d9a6;--danger:#ff6b6b}}
+@media (prefers-color-scheme:dark){:root{--bg:#0f0f0f;--bg-2:#171717;--text:#ededed;--text-2:#a3a3a3;--text-3:#737373;--border:#262626;--ok-bg:#1d3324;--ok-fg:#c8e6cf;--warn-bg:#3a2e14;--warn-fg:#f5d9a6;--danger:#ff6b6b;--accent:#0a84ff}}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;font-family:var(--sans);font-size:var(--table);line-height:18px;letter-spacing:var(--wide);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}

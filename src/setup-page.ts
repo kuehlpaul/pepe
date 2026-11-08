@@ -2,7 +2,7 @@
 // (developers.notion.com/prompts/setup): top bar, sidebar, article, on-this-page TOC.
 import { marked } from "marked";
 import { escape } from "./html";
-import { ARROW_UP_RIGHT, BASE_CSS, FONT_LINKS, LABEL, REPO_URL } from "./theme";
+import { ARROW_UP_RIGHT, BASE_CSS, FONT_LINKS, LABEL, REPO_URL, LOGO } from "./theme";
 import { SETUP_PUBLISHED, SETUP_VERSION, setupMarkdown } from "./setup";
 
 type ParsedSetup = {
@@ -111,7 +111,8 @@ body{line-height:20px}
 /* Top bar: brand cell, section cells, actions as cells */
 .topbar{position:sticky;top:0;z-index:40;display:flex;align-items:stretch;min-height:48px;border-bottom:1px solid var(--border);background:var(--bg)}
 .brand{display:flex;align-items:center;gap:10px;padding:0 16px;border-right:1px solid var(--border);font-weight:500;white-space:nowrap}
-.brand-mark{width:20px;height:20px;display:grid;place-items:center;background:var(--text);color:var(--bg);font:500 9px/1 var(--mono);letter-spacing:0}
+.brand-mark{width:22px;height:22px;display:block;flex:none}
+.brand-mark svg{display:block;width:100%;height:100%}
 .top-links{display:flex;align-items:stretch}
 .top-links a{display:flex;align-items:center;padding:0 16px;border-right:1px solid var(--border);${LABEL};font-size:11px;color:var(--text-2)}
 .top-links a svg{width:14px;height:14px;margin-left:6px}
@@ -250,7 +251,7 @@ ${FONT_LINKS}
 </head>
 <body>
 <header class="topbar">
-  <a class="brand" href="${escape(base)}/"><span class="brand-mark">CL</span> Context Layer <span class="word">Docs</span></a>
+  <a class="brand" href="${escape(base)}/"><span class="brand-mark">${LOGO}</span> Context Layer <span class="word">Docs</span></a>
   <nav class="top-links" aria-label="Sections">
     <a class="active" href="${escape(base)}/setup">Docs</a>
     <a href="${escape(base)}/ui">App</a>

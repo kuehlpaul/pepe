@@ -1,5 +1,5 @@
 import type { User } from "./accounts";
-import { ARROW_UP_RIGHT, BASE_CSS, BTN, FONT_LINKS, LABEL, REPO_URL } from "./theme";
+import { ARROW_UP_RIGHT, BASE_CSS, BTN, FONT_LINKS, LABEL, LOGO, REPO_URL } from "./theme";
 
 export const escape = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
@@ -11,7 +11,8 @@ export const CSS = `${BASE_CSS}
 /* Top nav: brand cell, page cells, user cell, sign-out cell */
 .top{position:sticky;top:0;z-index:10;display:flex;align-items:stretch;min-height:48px;border-bottom:1px solid var(--border);background:var(--bg)}
 .top a,.top .who{display:flex;align-items:center;gap:6px;padding:0 16px;${LABEL};font-size:11px;line-height:18px;white-space:nowrap}
-.top .brand{font-family:var(--sans);font-size:var(--table);font-weight:500;text-transform:none;border-right:1px solid var(--border)}
+.top .brand{gap:10px;font-family:var(--sans);font-size:var(--table);font-weight:500;text-transform:none;border-right:1px solid var(--border)}
+.top .brand svg{width:22px;height:22px;flex:none}
 .top nav{display:flex;align-items:stretch;overflow-x:auto;scrollbar-width:none}
 .top nav::-webkit-scrollbar{display:none}
 .top nav a+a{border-left:1px solid var(--border)}
@@ -147,10 +148,10 @@ const NAV: Array<[string, string]> = [
 export function layout(title: string, body: string, user?: User | null, current = "") {
 	const isActive = (href: string) => (href === "/ui" ? current === "/ui" : current === href || current.startsWith(href + "/"));
 	const header = user
-		? `<header class="top"><a class="brand" href="/ui">Context Layer</a><nav aria-label="App">${NAV.map(([href, label]) => `<a href="${href}"${isActive(href) ? ' class="active"' : ""}>${label}</a>`).join("")}${
+		? `<header class="top"><a class="brand" href="/ui">${LOGO}Context Layer</a><nav aria-label="App">${NAV.map(([href, label]) => `<a href="${href}"${isActive(href) ? ' class="active"' : ""}>${label}</a>`).join("")}${
 				user.role === "admin" ? `<a href="/admin"${isActive("/admin") ? ' class="active"' : ""}>Admin</a>` : ""
 			}</nav><span class="spacer"></span><span class="who">${escape(user.email)}</span><a class="out" href="/logout">Sign out</a></header>`
-		: `<header class="top"><a class="brand" href="/">Context Layer</a><span class="spacer"></span><nav aria-label="Site"><a href="/setup">Docs</a><a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a><a href="/login"${current === "/login" ? ' class="active"' : ""}>Sign in</a></nav></header>`;
+		: `<header class="top"><a class="brand" href="/">${LOGO}Context Layer</a><span class="spacer"></span><nav aria-label="Site"><a href="/setup">Docs</a><a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a><a href="/login"${current === "/login" ? ' class="active"' : ""}>Sign in</a></nav></header>`;
 	return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${escape(title)} · Context Layer</title>
 ${FONT_LINKS}
