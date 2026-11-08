@@ -178,15 +178,16 @@ npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View o
 </body></html>`;
 }
 
-export async function handleWaitlist(request: Request, base: string): Promise<Response> {
-	if (request.method !== "POST") return Response.redirect(`${base}/`, 302);
+/** `base` is the app (PUBLIC_URL, for the setup link); `landingBase` is where the landing page is served. */
+export async function handleWaitlist(request: Request, base: string, landingBase = base): Promise<Response> {
+	if (request.method !== "POST") return Response.redirect(`${landingBase}/`, 302);
 	const form = await request.formData();
 	// Honeypot: real browsers leave this hidden field empty; bots usually fill every field.
-	if (String(form.get("website") ?? "")) return Response.redirect(`${base}/?joined=1`, 302);
+	if (String(form.get("website") ?? "")) return Response.redirect(`${landingBase}/?joined=1`, 302);
 	const email = normalizeEmail(form.get("email"));
 	if (!isEmail(email)) {
 		return new Response(landingHtml(base, { error: "Please enter a valid email address.", email }), { status: 400, headers: { "Content-Type": "text/html; charset=utf-8" } });
 	}
 	await joinWaitlist({ email, reason: String(form.get("reason") ?? "") });
-	return Response.redirect(`${base}/?joined=1`, 302);
+	return Response.redirect(`${landingBase}/?joined=1`, 302);
 }

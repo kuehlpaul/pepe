@@ -3,3 +3,4 @@ SESSION_SECRET=<openssl rand -hex 32>
 CONSENT_SECRET=<openssl rand -hex 32>
 # Optional: enables "send by email" for invites and self-service password reset (https://resend.com)
 RESEND_API_KEY=
+LANDING_HOST=

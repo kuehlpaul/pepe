@@ -18,6 +18,19 @@ export default {
 		const url = new URL(request.url);
 		const { pathname } = url;
 		const base = env.PUBLIC_URL.replace(/\/$/, "");
+		const html = { "Content-Type": "text/html; charset=utf-8" };
+		// Optional marketing host (LANDING_HOST): serves only the landing page and the waitlist. The app, docs, OAuth
+		// and MCP live on PUBLIC_URL. Any other hostname (e.g. the workers.dev one) is an alias and redirects.
+		const landingHost = env.LANDING_HOST || "";
+		const landingBase = landingHost ? `https://${landingHost}` : base;
+		const moved = (to: string) => Response.redirect(to, request.method === "GET" || request.method === "HEAD" ? 301 : 308);
+		if (landingHost && (url.hostname === landingHost || url.hostname === `www.${landingHost}`)) {
+			if (url.hostname !== landingHost) return moved(`${landingBase}${pathname}${url.search}`);
+			if (pathname === "/") return new Response(landingHtml(base, { joined: url.searchParams.has("joined") }), { headers: html });
+			if (pathname === "/waitlist") return handleWaitlist(request, base, landingBase);
+			return moved(`${base}${pathname}${url.search}`);
+		}
+		if (url.hostname !== new URL(base).hostname) return moved(`${base}${pathname}${url.search}`);
 
 		// MCP endpoint (+ RFC 9728 protected resource metadata)
 		if (pathname === "/mcp" || pathname.startsWith("/mcp/") || pathname.startsWith("/.well-known/oauth-protected-resource")) {
@@ -46,9 +59,10 @@ export default {
 		// Public: start page + waitlist, sign-up by invite, sign-in, password reset
 		if (pathname === "/") {
 			if (await currentUser(request)) return Response.redirect(`${base}/ui`, 302);
-			return new Response(landingHtml(base, { joined: url.searchParams.has("joined") }), { headers: { "Content-Type": "text/html; charset=utf-8" } });
+			if (landingHost) return Response.redirect(`${landingBase}/${url.search}`, 302);
+			return new Response(landingHtml(base, { joined: url.searchParams.has("joined") }), { headers: html });
 		}
-		if (pathname === "/waitlist") return handleWaitlist(request, base);
+		if (pathname === "/waitlist") return handleWaitlist(request, base, landingBase);
 		if (pathname === "/join") return handleJoin(request, ctx);
 		if (pathname === "/login") return handleLogin(request);
 		if (pathname === "/logout") return handleLogout();
