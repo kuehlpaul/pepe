@@ -77,7 +77,7 @@ So the user can try a new agent without starting over, and another agent can pic
 
 Context grows more valuable over time. When it lives in the Context Layer, it belongs to the user — not to you, a model, or a chat history.
 
-They can read it, edit it, and delete it in the web UI at ${ui}. They decide what’s remembered. Nothing an agent writes is hidden: every write is logged.
+They can see all of it, and delete any of it, in the web UI at ${ui}. Changes are made through agents like you, never by hand there, so when the user wants something corrected or removed, do it. Nothing an agent writes is hidden: every write is logged.
 
 ### What it stores
 
@@ -241,7 +241,7 @@ If there’s nothing to save, say so and offer to capture something useful for w
 
 Go back to the guide so future agents know where everything lives. Replace each “Not set up yet” with what’s true (UI links, that memories/documents/skills/lessons live in the Context Layer MCP, any user preferences or exclusions you learned). If the user skipped something, leave it. Don’t guess. Add a version-history line for completing setup, but keep the guide version at \`{{version}}\`.
 
-Then wrap up in two or three sentences: that you are connected, that custom instructions are in place (or what’s left), what was saved, whether the daily sync is set up, and that the user can see and edit everything at ${ui}. Suggest trying a new chat or another agent with this same page (${setup}) to see it remember.
+Then wrap up in two or three sentences: that you are connected, that custom instructions are in place (or what’s left), what was saved, whether the daily sync is set up, and that the user can see everything at ${ui}. Suggest trying a new chat or another agent with this same page (${setup}) to see it remember.
 
 ### Last step: open the web UI
 
@@ -249,14 +249,14 @@ At the end of setup, show one last choice:
 
 | Option | What to do |
 | - | - |
-| Open the Context Layer UI (Recommended) | Share ${ui} so they can review About me, memories, documents, lessons, exclusions and tokens. |
+| Open the Context Layer UI (Recommended) | Share ${ui} so they can review what was saved and which agents are connected. |
 | Skip for now | Move on. |
 
 Either way, end with a short thank-you. Setup is done.
 
 ## Agent Operating Guide
 
-Use this template when creating the guide (document title **Agent Operating Guide**, and the Settings → Agent operating guide field).
+Use this template when creating the guide (document title **Agent Operating Guide**, saved with \`save_guide\`).
 
 Version: \`{{version}}\` · Published: \`{{published_date}}\`
 
@@ -274,7 +274,7 @@ Source: Personal Context Layer setup prompt
 
 ### User preferences and exclusions
 
-Not recorded yet. (Also maintain exclusions in Settings; agents see them on connect and in \`get_context\`.)
+Not recorded yet. (Record exclusions with \`add_exclusion\`; agents see them on connect and in \`get_context\`.)
 
 ### Version history
 

@@ -149,7 +149,7 @@ Migrations are additive. `0003` introduces accounts and tags pre-existing single
 | `get_document_history` | Earlier versions of a document and who wrote them |
 | `list_skills` / `get_skill` | Names of enabled skills, and the full instructions of one |
 
-**Write** (requires scope `mcp:write`)
+**Write** (every connected agent gets this; the web UI itself is read-only apart from deleting)
 
 | Tool | Description |
 |---|---|
@@ -161,6 +161,7 @@ Migrations are additive. `0003` introduces accounts and tags pre-existing single
 | `save_skill` | Create or update a reusable `SKILL.md`-style skill |
 | `save_about` | Update the short "About me" profile |
 | `save_guide` | Create or replace the Agent Operating Guide |
+| `add_exclusion` / `remove_exclusion` | Rules for what must never be stored; shown to every agent on connect |
 
 ## Security and access control
 

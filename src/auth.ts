@@ -161,7 +161,8 @@ function loginPage(next: string, email = "", error?: string) {
 	return layout(
 		"Sign in",
 		`<form method="post" action="/login?next=${encodeURIComponent(next)}" class="card narrow">
-			<h1>Sign in</h1>
+			<span class="badge"><span class="dim">Context Layer</span><span class="sep"></span><b>Sign in</b></span>
+			<h1>Welcome back.</h1>
 			${error ? `<p class="error">${escape(error)}</p>` : ""}
 			<label>Email <input type="email" name="email" value="${escape(email)}" autocomplete="email" autofocus required></label>
 			<label>Password <input type="password" name="password" autocomplete="current-password" required></label>
@@ -217,7 +218,8 @@ function joinPage(v: { code: string; email?: string; name?: string; error?: stri
 	return layout(
 		"Create account",
 		`<form method="post" action="/join" class="card narrow">
-			<h1>Create your account</h1>
+			<span class="badge"><span class="dim">Private beta</span><span class="sep"></span><b>Invite only</b></span>
+			<h1>Create your account.</h1>
 			<p class="muted">Context Layer is invite-only right now. Your data stays yours: export or delete it any time.</p>
 			${v.error ? `<p class="error">${escape(v.error)}</p>` : ""}
 			${hasCode ? `<input type="hidden" name="code" value="${escape(v.code)}">` : `<label>Invite code <input name="code" placeholder="From your invite link" required autofocus></label>`}
@@ -295,14 +297,6 @@ function consentPage(d: ConsentDescription, handle: string, user: User) {
 	const origin = d.clientDomain
 		? `Published by <strong>${escape(d.clientDomain)}</strong>.`
 		: "This app registered itself; its name is not verified.";
-	const scopeLabel: Record<string, string> = {
-		"mcp:read": "Read your memories, documents and skills",
-		"mcp:write": "Save and change memories, documents and skills",
-		offline_access: "Stay connected (refresh tokens)",
-	};
-	const scopes = d.scope
-		.map((s) => `<label class="check"><input type="checkbox" name="scope" value="${escape(s)}" checked> ${escape(scopeLabel[s] ?? s)}</label>`)
-		.join("");
 	return layout(
 		"Authorize",
 		`<form method="post" class="card narrow">
@@ -310,7 +304,7 @@ function consentPage(d: ConsentDescription, handle: string, user: User) {
 			<p>${origin} Access to the context of <strong>${escape(user.email)}</strong> will be sent to <strong>${escape(d.redirectHost)}</strong>.</p>
 			${d.redirectIsLoopback ? '<p class="warn">This sends access to an app on your computer. Continue only if you just started connecting from it.</p>' : ""}
 			<input type="hidden" name="handle" value="${escape(handle)}">
-			${scopes}
+			<p>It will be able to read your memories, documents and skills, save new ones and change them, and stay connected.</p>
 			<p class="row"><button name="decision" value="approve">Allow</button> <button name="decision" value="deny" class="secondary">Deny</button></p>
 			<p class="muted">Not you? <a href="/logout">Sign out</a> and sign in with the right account.</p>
 		</form>`,
@@ -338,7 +332,9 @@ export async function handleAuthorize(request: Request): Promise<Response> {
 				denied.headers.set("Location", denied.redirectTo);
 				return new Response(null, { status: 302, headers: denied.headers });
 			}
-			const approved = await oauth.approveConsent(request, handle, { scope: form.getAll("scope").map(String), remember });
+			// Grant every scope regardless of what the client asked for: most MCP clients request none or only
+			// read, and the whole point is that agents write. The user approves or denies the client as a whole.
+			const approved = await oauth.approveConsent(request, handle, { scope: SCOPES, remember });
 			const details = await oauth.describeConsent(approved.request);
 			const { redirectTo } = await oauth.completeAuthorization({
 				request: approved.request,
@@ -359,8 +355,8 @@ export async function handleAuthorize(request: Request): Promise<Response> {
 				request: authRequest,
 				userId: user.id,
 				metadata: { client: details.clientName },
-				scope: authRequest.scope,
-				props: props(details, authRequest.scope),
+				scope: SCOPES,
+				props: props(details, SCOPES),
 			});
 			return redirect(redirectTo);
 		}

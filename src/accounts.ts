@@ -130,7 +130,7 @@ export const legacyOwnerUserId = () => getInstanceValue(LEGACY_OWNER_KEY);
 
 export const isConfiguredAdmin = (email: string) => !!E().ADMIN_EMAIL && normalizeEmail(email) === normalizeEmail(E().ADMIN_EMAIL);
 
-const DEFAULT_ABOUT = "Not set up yet. Edit this in Settings, or share the setup page with an agent: who you are, your role, current projects, how you like to work.";
+const DEFAULT_ABOUT = "Not set up yet. Share the setup page with an agent and it will fill this in: who you are, your role, current projects, how you like to work.";
 const DEFAULT_GUIDE = `# Agent Operating Guide
 
 Version 0.1.0

@@ -337,6 +337,30 @@ async function createServer() {
 	);
 
 	server.registerTool(
+		"add_exclusion",
+		{
+			title: "Add exclusion",
+			description:
+				"Record a rule for what must never be stored (e.g. 'Never store anything about my health'). Every agent sees exclusions on connect. Use when the user says something must not be remembered.",
+			inputSchema: { rule: z.string().min(1).describe("The rule, as one sentence") },
+		},
+		async ({ rule }) => text({ saved: true, id: await store.addExclusion(rule) }),
+	);
+
+	server.registerTool(
+		"remove_exclusion",
+		{
+			title: "Remove exclusion",
+			description: "Delete an exclusion rule by id (ids come from get_context). Only when the user asks to lift the rule.",
+			inputSchema: { id: z.string().describe("Exclusion id, exc_…") },
+		},
+		async ({ id }) => {
+			await store.removeExclusion(id);
+			return text({ removed: true, id });
+		},
+	);
+
+	server.registerTool(
 		"save_guide",
 		{
 			title: "Save Agent Operating Guide",

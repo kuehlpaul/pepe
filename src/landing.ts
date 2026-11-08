@@ -3,17 +3,11 @@
 // a sticky left panel (badge, headline, waitlist form) and a scrolling right column with a
 // three-cell nav, ruled section headers, a 1px-bordered feature grid and an infrastructure table.
 import { escape } from "./html";
+import { ARROW_RIGHT, ARROW_UP_RIGHT, BASE_CSS, FONT_LINKS, REPO_URL } from "./theme";
 import { isEmail, joinWaitlist, normalizeEmail } from "./accounts";
 
 const CSS = `
-:root{--bg:#fff;--bg-2:#f7f7f5;--text:#0f0f0f;--text-2:#5c5c5c;--text-3:#8a8a8a;--border:#e8e8e8;--ok-bg:#e6f4ea;--ok-fg:#1e4620;--danger:#c92a2a;
---sans:Geist,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;--mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
---xs:12.5px;--table:14px;--base:16px;--h2:17.6px;--display:48px;--wide:.04em;color-scheme:light dark}
-@media (prefers-color-scheme:dark){:root{--bg:#0f0f0f;--bg-2:#171717;--text:#ededed;--text-2:#a3a3a3;--text-3:#737373;--border:#262626;--ok-bg:#1d3324;--ok-fg:#c8e6cf;--danger:#ff6b6b}}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:var(--sans);font-size:var(--table);line-height:18px;letter-spacing:var(--wide);background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-a{color:inherit;text-decoration:none}
+${BASE_CSS}
 .mono{font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:var(--wide)}
 
 /* Split layout: 40% sticky panel | 1px rule | 60% content */
@@ -23,11 +17,6 @@ a{color:inherit;text-decoration:none}
 .content{flex:0 0 60%;width:60%;display:flex;flex-direction:column}
 
 /* Left panel */
-.badge{display:inline-flex;align-items:center;gap:8px;padding:4px 12px;border-radius:99px;background:var(--bg-2);font-size:var(--xs);line-height:18px}
-.badge .dim{color:var(--text-3)}
-.badge .sep{width:1px;height:12px;background:var(--text)}
-.badge b{font-weight:500;display:inline-flex;align-items:center;gap:4px}
-.badge svg{width:16px;height:16px;flex:none}
 h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weight:500;line-height:1.1;letter-spacing:-.03em}
 .form{display:flex;align-items:center;gap:24px;padding-top:16px;flex-wrap:wrap}
 .field{position:relative;width:250px;max-width:100%}
@@ -36,8 +25,6 @@ h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weigh
 .field .plus{position:absolute;right:-10px;bottom:-10px;width:8px;height:8px;font:8px/8px var(--mono);color:var(--border);text-align:center;pointer-events:none}
 .field input{display:block;width:100%;margin:0;padding:8px 20px;border:0;background:transparent;color:var(--text);font:500 14px/20px var(--sans);letter-spacing:0;outline:0}
 .field input::placeholder{color:var(--text-3)}
-.btn{display:inline-flex;align-items:center;gap:4px;padding:8px 16px;border:0;background:var(--text);color:var(--bg);font-family:var(--mono);font-size:11px;font-weight:500;line-height:18px;letter-spacing:var(--wide);text-transform:uppercase;cursor:pointer;white-space:nowrap}
-.btn:hover{opacity:.85}
 .hint{margin:0;font-size:var(--xs);line-height:16px;color:var(--text-3);max-width:454px}
 .hint.err{color:var(--danger)}
 .hp{position:absolute;left:-9999px;opacity:0;height:0;width:0}
@@ -55,12 +42,8 @@ h1{margin:0;padding-top:16px;max-width:454px;font-size:var(--display);font-weigh
 /* Right column: sections */
 .body{display:flex;flex-direction:column;gap:36px;padding:36px}
 section{display:flex;flex-direction:column;gap:24px}
-.sh{display:flex;align-items:center;gap:16px}
-.sh h2{margin:0;font-size:var(--h2);line-height:18px;white-space:nowrap}
-.sh .line{flex:1;height:1px;background:var(--border)}
 section p{margin:0;font-size:var(--table);line-height:18px}
 section p+p{margin-top:8px}
-code{font-family:var(--mono);font-size:.92em;letter-spacing:0;background:var(--bg-2);padding:1px 5px}
 
 
 .grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--border)}
@@ -103,10 +86,7 @@ pre{margin:0;padding:12px 16px;border:1px solid var(--border);background:var(--b
 @media (max-width:480px){h1{font-size:36px}.form{gap:20px}.field{width:100%}.tr{grid-template-columns:1fr}.tr .k{border-right:0;border-bottom:1px solid var(--border);padding-bottom:8px}.tr .v{padding-top:8px}}
 `;
 
-export const REPO_URL = "https://github.com/kuehlpaul/personal-context-layer";
-
-const ARROW_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.787 8.667H2.667V7.333h8.12L7.053 3.6 8 2.667l5.333 5.333L8 13.333l-.947-.933 3.734-3.733Z" fill="currentColor"/></svg>`;
-const ARROW_UP_RIGHT = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.267 12 3.333 11.067 9.733 4.667H4V3.333h8v8h-1.333V5.6L4.267 12Z" fill="currentColor"/></svg>`;
+export { REPO_URL };
 
 const FEATURES: Array<[string, string]> = [
 	["Memories", "Preferences, facts, decisions and the people around you. One fact per memory, with source and date. Superseded instead of overwritten, so history stays."],
@@ -114,7 +94,7 @@ const FEATURES: Array<[string, string]> = [
 	["Lessons", "When you correct an agent, the correction becomes guidance every other agent receives the moment it connects. Mistakes are made once."],
 	["Skills", "Reusable, SKILL.md-style instructions. Any agent lists them, loads the one that applies to the task and follows it."],
 	["Search", "Semantic search over everything you've stored, plus keyword fallback. Agents call it before working on anything personal."],
-	["Your rules", "Tell it what must never be stored. Forgotten content is blocked from being re-saved. Every write by every agent is logged and editable."],
+	["Your rules", "Tell it what must never be stored. Forgotten content is blocked from being re-saved. Every write by every agent is logged and visible to you."],
 ];
 
 const INFRA: Array<[string, string]> = [
@@ -144,8 +124,7 @@ export function landingHtml(base: string, state: { joined?: boolean; error?: str
 	return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Context Layer · One memory for every AI agent you use</title>
 <meta name="description" content="A personal context layer: one remote MCP server that gives Claude, ChatGPT, Cursor, Claude Code and any other agent the same durable memory about you. You own the data.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap">
+${FONT_LINKS}
 <style>${CSS}</style></head><body>
 <div class="page">
 <aside class="panel">

@@ -19,7 +19,7 @@ import {
 	type User,
 } from "./accounts";
 import { deleteAccount } from "./auth";
-import { escape, htmlResponse, layout, redirect, sameOrigin } from "./html";
+import { escape, htmlResponse, layout, redirect, sameOrigin, sh } from "./html";
 import { Store } from "./store";
 
 const date = (iso: string | null | undefined) => (iso ? escape(iso.slice(0, 16).replace("T", " ")) : "—");
@@ -144,7 +144,7 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 			<td>${i.uses}/${i.max_uses}</td><td class="muted">${date(i.created_at)}</td><td class="muted">${i.expires_at ? date(i.expires_at) : "never"}</td>
 			<td class="row">${
 				!i.revoked_at && i.uses < i.max_uses
-					? `<input class="mono" readonly value="${escape(inviteLink(i))}" onclick="this.select()" style="max-width:260px;margin:0;font-size:.75rem">` +
+					? `<input class="mono" readonly value="${escape(inviteLink(i))}" onclick="this.select()" style="max-width:260px">` +
 						(i.email && emailConfigured() ? act("email_invite", i.id, "Email") : "") +
 						act("revoke_invite", i.id, "Revoke", "danger small")
 					: ""
@@ -165,8 +165,8 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 					: `<div class="row">${u.status === "active" ? act("user_disable", u.id, "Disable") : act("user_enable", u.id, "Enable", "small")}${
 							u.role === "admin" ? act("user_remove_admin", u.id, "Remove admin") : act("user_make_admin", u.id, "Make admin")
 						}${act("user_reset_link", u.id, "Reset link")}</div>
-						<details><summary class="muted" style="cursor:pointer;font-size:.85rem">Delete account…</summary>
-						<form method="post" class="row">${hidden("action", "user_delete")}${hidden("id", u.id)}<input name="confirm" placeholder="type ${escape(u.email)}" class="grow" style="margin:0"><button class="danger small">Delete user and all data</button></form></details>`
+						<details><summary>Delete account…</summary>
+						<form method="post" class="row">${hidden("action", "user_delete")}${hidden("id", u.id)}<input name="confirm" placeholder="type ${escape(u.email)}" class="grow"><button class="danger small">Delete user and all data</button></form></details>`
 			}</td></tr>`;
 		})
 		.join("");
@@ -174,7 +174,7 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 	return htmlResponse(
 		layout(
 			"Admin",
-			`<h1>Admin</h1>
+			`${sh("Admin", "", "h1")}
 			<div class="stats"><div class="stat"><b>${users.length}</b><span>accounts</span></div><div class="stat"><b>${pending}</b><span>waiting</span></div><div class="stat"><b>${openInvites}</b><span>open invites</span></div><div class="stat"><b>${users.filter((u) => u.last_agent_activity && u.last_agent_activity > new Date(Date.now() - 7 * 86400_000).toISOString()).length}</b><span>active with agents, 7d</span></div></div>
 			${flash}
 
@@ -182,7 +182,7 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 			<div class="table-wrap"><table><tr><th>Who</th><th>Why</th><th>Status</th><th>Signed up</th><th></th></tr>${waitlistRows || '<tr><td colspan="5" class="muted">Nobody waiting.</td></tr>'}</table></div></div>
 
 			<div class="card"><h2>Invites</h2>
-			<form method="post" class="row">${hidden("action", "create_invite")}<input name="email" type="email" placeholder="Bind to email (optional)" class="grow" style="margin:0"><input name="max_uses" type="number" min="1" value="1" title="Uses" style="width:70px;margin:0"><input name="days" type="number" min="0" placeholder="days" title="Expires in days (empty = never)" style="width:80px;margin:0"><input name="note" placeholder="Note" style="width:160px;margin:0"><button>Create invite</button></form>
+			<form method="post" class="row">${hidden("action", "create_invite")}<input name="email" type="email" placeholder="Bind to email (optional)" class="grow"><input name="max_uses" type="number" min="1" value="1" title="Uses" style="width:72px"><input name="days" type="number" min="0" placeholder="Days" title="Expires in days (empty = never)" style="width:84px"><input name="note" placeholder="Note" style="width:160px"><button>Create invite</button></form>
 			<div class="table-wrap"><table><tr><th></th><th>For</th><th>Uses</th><th>Created</th><th>Expires</th><th>Link</th></tr>${inviteRows || '<tr><td colspan="6" class="muted">No invites yet.</td></tr>'}</table></div></div>
 
 			<div class="card"><h2>Accounts</h2><p class="muted">Disabling an account signs it out and blocks its tokens and OAuth grants immediately. Deleting removes all of its data and vectors.</p>
@@ -190,6 +190,7 @@ export async function handleAdmin(request: Request, env: Env, admin: User): Prom
 
 			<p class="muted">Email sending: ${emailConfigured() ? "configured" : "not configured. Set RESEND_API_KEY (secret) and EMAIL_FROM (var) to send invites and resets from here. Until then, copy links and send them yourself."}</p>`,
 			admin,
+			"/admin",
 		),
 	);
 }
