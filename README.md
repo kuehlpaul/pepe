@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/pepe.svg" alt="Pepe" width="96">
+
 # Pepe
 
 **Your second brain for every AI agent.**
@@ -53,8 +55,8 @@ The agent connects over MCP, installs custom instructions for when to read and w
 You need a Cloudflare account with Workers, D1, KV, Vectorize and Workers AI enabled (all available on the free tier).
 
 ```bash
-git clone https://github.com/kuehlpaul/pepe-brain.git
-cd pepe-brain
+git clone https://github.com/kuehlpaul/pepe.git
+cd pepe
 npm install
 
 # 1. Create the resources and put their names and IDs into wrangler.jsonc

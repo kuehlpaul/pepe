@@ -160,7 +160,7 @@ ${form}
 <div class="two">
 <div><span class="tag">01 · Hosted</span><h3>Use the hosted Pepe</h3><p>We run it on Cloudflare. Accounts are isolated, every write is logged, and you can export or delete everything at any time. Invite-only while the beta is small.</p><a class="cta" href="#waitlist">Join the waitlist ${ARROW_RIGHT}</a></div>
 <div><span class="tag">02 · Self-hosted</span><h3>Run your own Pepe</h3><p>Clone the repository, create the Cloudflare resources listed in the README and deploy. Your account, your Worker, your data.</p><pre>git clone ${REPO_URL}.git
-cd pepe-brain &amp;&amp; npm install
+cd pepe &amp;&amp; npm install
 npx wrangler deploy</pre><a class="cta" href="${REPO_URL}" rel="noopener">View on GitHub ${ARROW_UP_RIGHT}</a></div>
 </div>
 </section>
