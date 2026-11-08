@@ -142,6 +142,7 @@ ${form}
 <a href="#readme">Readme</a>
 <a href="${escape(base)}/setup">Docs</a>
 <a href="${REPO_URL}" rel="noopener">GitHub ${ARROW_UP_RIGHT}</a>
+<a href="${escape(base)}/login" id="nav-login">Log in</a>
 <a href="#waitlist" class="cta" id="nav-waitlist">Waitlist ${ARROW_UP_RIGHT}</a>
 </nav>
 <div class="body">
